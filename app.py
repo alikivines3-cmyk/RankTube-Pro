@@ -23,6 +23,7 @@ h1,h2,h3 { color: white !important; }
 .fix { background:#1E1B4B; border:1px solid #7C3AED; padding:12px; border-radius:12px; margin-bottom:8px; }
 .quran-box { background: linear-gradient(135deg,#064E3B,#065F46); border:2px solid #10B981; padding:18px; border-radius:18px; text-align:center; }
 .review-box { background: linear-gradient(135deg,#4C0519,#881337); border:2px solid #F43F5E; padding:18px; border-radius:18px; }
+.paste-box { background: linear-gradient(135deg,#1E1B4B,#312E81); border:2px solid #7C3AED; padding:18px; border-radius:18px; }
 .stButton>button { background: linear-gradient(90deg,#7C3AED,#EC4899); color:white; border:none; border-radius:25px; font-weight:bold; width:100%; }
 </style>
 """, unsafe_allow_html=True)
@@ -34,121 +35,76 @@ if "script" not in st.session_state: st.session_state.script=""
 if "videos_today" not in st.session_state: st.session_state.videos_today=0
 
 try:
-    YT=st.secrets["YOUTUBE_API_KEY"]
-    GM=st.secrets["GEMINI_API_KEY"]
+    YT = st.secrets["YOUTUBE_API_KEY"]
 except:
-    YT=""; GM=""
+    YT = ""
+try:
+    GROQ_KEY = st.secrets["GROQ_API_KEY"]
+except:
+    GROQ_KEY = ""
+try:
+    GM = st.secrets["GEMINI_API_KEY"]
+except:
+    GM = ""
 
 def local_script_for_mode(mode, topic, extra):
     if mode=="Drama Review + Prediction":
-        return f"""[Drama Review + Prediction - 1 Character - Beth Kar Batayega]
+        return f"""Assalam O Alaikum Doston...! Aaj hum baat karenge {topic} ke baare me...! Jo kal episode me hua, wo sun kar tum hairan reh jaoge...!
 
-Assalam O Alaikum Doston...! Aaj hum baat karenge {topic} ke baare me...! Jo kal episode me hua, wo sun kar tum hairan reh jaoge...!
-
-[PART 1 - YE HUA - Pichli Episode Ka Review]
-
+[PART 1 - YE HUA]
 Doston, kal ki episode me ye hua...! Hero ne...! Heroine ne...! Aur Villain ne to hadd hi kar di...!
+Hero ne jab {topic} me ye kaha...! To Heroine ko gussa aa gaya...! Aur phir...! Ohh...! Kya scene tha...!
 
-Sab se pehle...! Hero ne jab {topic} me ye kaha...! To Heroine ko gussa aa gaya...! Aur phir...! Ohh...! Kya scene tha...!
-
-Phir Ammi ne aakar...! Sab ko samjhaya...! Lekin Villain ne peeche se...! Hmm...! Ye to galat hua na...?
-
-[PART 2 - WO HUA - Detail Me]
-
-Doston, ek ek karke samjhte hain...!
-
-Pehla - Hero ka kya kasoor tha...? Usne jo kiya, wo sahi tha ya galat...? Mujhe lagta hai...!
-
+[PART 2 - WO HUA]
+Pehla - Hero ka kya kasoor tha...? Mujhe lagta hai...!
 Dusra - Heroine ne jo faisla liya...! Wo bilkul sahi tha...! Kyunki...!
-
-Teesra - Villain ka plan...! Usne jo chaal chali...! Wo to sab ko pata chal gaya...! Hahaha...!
+Teesra - Villain ka plan...! Usne jo chaal chali...! Hahaha...!
 
 [PART 3 - AAGE KYA HOGA? - PREDICTION]
-
 Ab sab se bara sawal...! Aage kya hoga...?
+1. Hero, Heroine se maafi maangega...! Aur Heroine maan jayegi...!
+2. Villain, ek naya plan banayega...! Lekin Hero ko pata chal jayega...!
+3. Aur aakhir me...! Ek bada twist aayega...! Koi purana character wapas aayega...!
 
-Meri prediction ye hai...! Agli episode me...!
-
-1. Hero, Heroine se maafi maangega...! Aur Heroine maan jayegi...! Ya nahi maanegi...? Mujhe lagta hai maan jayegi...!
-
-2. Villain, ek naya plan banayega...! Wo Hero ko phasane ki koshish karega...! Lekin...! Hero ko pata chal jayega...!
-
-3. Aur aakhir me...! Ek bada twist aayega...! Koi purana character wapas aayega...! Aur sab kuch badal jayega...!
-
-Doston, tumko kya lagta hai...? Meri prediction sahi hai ya galat...? Comment me batao...! Tumhari prediction kya hai...? Agli episode me kya hoga...?
-
-Agar review pasand aaya, to LIKE karo...! COMMENT karo...! SUBSCRIBE karo...! Kal phir milenge, nayi episode ke review ke saath...! Allah Hafiz...!"""
+Doston, tumko kya lagta hai...? Meri prediction sahi hai ya galat...? Comment me batao...! Tumhari prediction kya hai...?
+Agar review pasand aaya, to LIKE karo...! COMMENT karo...! SUBSCRIBE karo...! Allah Hafiz...!"""
     if mode=="Single Video":
-        return f"""[Single Video - 1 Aadmi - Bayan / Kahani]
-
-Assalam O Alaikum Doston...! Aaj ki kahani bohat khaas hai...!
-
+        return f"""Assalam O Alaikum Doston...! Aaj ki kahani bohat khaas hai...!
 Doston, ek dafa ka zikr hai... Ek aadmi tha, jo {topic} ke baare me soch raha tha...!
-
 Usne socha... Hmm... Kya karun...? Phir usko ek khayal aaya...!
-
 Aur phir... Jo hua, wo tum sun kar hairan reh jaoge...!
-
 Doston, is kahani se humein ye seekhne ko milta hai... Ke kabhi haar mat maano...!
-
 Agar kahani pasand aayi, to LIKE karo...! COMMENT me batao...! SUBSCRIBE karo...!"""
     if mode=="Podcast Video":
-        return f"""[Podcast - Host + Guest]
-
-Host: Assalam O Alaikum...! Aaj hamare saath hain mehmaan...! Sir, {topic} ke baare me aap kya kehte hain...?
-
+        return f"""Host: Assalam O Alaikum...! Aaj hamare saath hain mehmaan...! Sir, {topic} ke baare me aap kya kehte hain...?
 Guest: Walaikum Assalam...! Dekhen, {topic} ek bohat bara topic hai...!
-
 Host: Hmm...! To aapka matlab hai...? Ye itna aasan nahi hai...?
-
 Guest: Bilkul...! Main aapko ek misaal deta hoon...! Ek dafa...!
-
 Host: Ohh...! Ye to bohat interesting hai...!
-
 Guest: Mera mashwara ye hai...! Mehnat karo...! Sabar karo...!"""
     if mode=="Comedy Show":
-        return f"""[Comedy - Bablu + Chacha]
-
-Bablu: Chacha...! Mujhe {topic} ke baare me kuch poochna hai...?
-
+        return f"""Bablu: Chacha...! Mujhe {topic} ke baare me kuch poochna hai...?
 Chacha: Haan Bablu...! Bolo...! Kya hua...? Hahaha...!
-
 Bablu: {topic} ka matlab kya hota hai...?
-
 Chacha: Arey Bablu...! Tumko itna bhi nahi pata...? Hahaha...! Suno...!
-
 Bablu: Ohh...! To ye baat hai...! Chacha, aap to bohat samajhdaar ho...! Hahaha...!"""
     if mode=="Drama":
-        return f"""[Drama - Scene 1 - Ghar Me]
-
+        return f"""Scene 1 - Ghar Me:
 Hero: Ammi...! Mujhe {topic} ke baare me baat karni hai...!
-
 Ammi: Haan beta...! Bolo...! Kya hua...?
-
 Heroine: Ammi, inko chhoren...! Ye to har waqt {topic} ki baat karte hain...!
-
 Villain: Hahaha...! Tum logon ko pata bhi hai...! {topic} ka asal raaz kya hai...?
-
 Hero: Kya...? Batao...! Jaldi batao...!
-
 Ammi: Bas karo sab...! Pehle chai peelo...!
-
 [To Be Continued - Part 2 Me...!]"""
     if mode=="Vlog":
-        return f"""[Vlog]
-
-Tum: Assalam O Alaikum Doston...! Aaj hum aaye hain {extra} me...! Dekhen kitna pyara nazara hai...!
-
+        return f"""Tum: Assalam O Alaikum Doston...! Aaj hum aaye hain {extra} me...! Dekhen kitna pyara nazara hai...!
 Dost: Haan yaar...! Aaj to hawa bhi bohat achi hai...!
-
 Tum: Doston, ye jagah {extra} hai...! Iski kahani ye hai...!
-
 Dost: Wah yaar...! Mujhe to pata hi nahi tha...!
-
 Tum: Chalo, aage chalte hain...! Idhar dekhen...!"""
     if mode=="Quran Recitation":
         return f"""[Quran - Quran.com Wala]
-
 1. Arabic Ayat Screen Par - Bade Lafz Me - Highlight
 2. Qari Ki Awaz - Arabic Me - Quran.com Wali
 3. 1 Sec Rukega...
@@ -156,56 +112,54 @@ Tum: Chalo, aage chalte hain...! Idhar dekhen...!"""
 5. Urdu Tarjuma Screen Par - Neeche
 6. Background - Makkah / Madina
 7. Phir Agli Ayat
-
 Surah: {extra}
 Ayat 1 - Arabic: (Quran.com Se Audio)
 Tarjuma: Allah ke naam se shuru, jo bohat meherban hai...!
-
 [Avatar Band - Music Band - Credit: Recitation & Text via Quran.com / Quran Foundation - Translation Voice: Zeniq]"""
     return "Script..."
 
 def ai(prompt, topic="", mode="", extra=""):
-    models=["gemini-2.0-flash","gemini-1.5-flash"]
-    for m in models:
+    if GROQ_KEY:
         try:
-            url=f"https://generativelanguage.googleapis.com/v1beta/models/{m}:generateContent?key={GM}"
-            r=requests.post(url, json={"contents":[{"parts":[{"text":prompt[:1500]}]}]}, timeout=20).json()
-            if "candidates" in r and len(r["candidates"])>0:
-                return r["candidates"][0]["content"]["parts"][0]["text"] + "\n\n✅ AI Se Bana Hai"
-        except: continue
-    low=prompt.lower()
+            url = "https://api.groq.com/openai/v1/chat/completions"
+            headers = {"Authorization": f"Bearer {GROQ_KEY}", "Content-Type": "application/json"}
+            payload = {"model": "llama-3.3-70b-versatile", "messages": [{"role": "user", "content": prompt[:2000]}], "temperature": 0.7, "max_tokens": 1500}
+            r = requests.post(url, headers=headers, json=payload, timeout=25).json()
+            if "choices" in r and len(r["choices"]) > 0:
+                return r["choices"][0]["message"]["content"] + "\n\n✅ Groq AI Se Bana Hai - Fast!"
+        except:
+            pass
+    if GM:
+        models = ["gemini-2.0-flash", "gemini-1.5-flash"]
+        for m in models:
+            try:
+                url2 = f"https://generativelanguage.googleapis.com/v1beta/models/{m}:generateContent?key={GM}"
+                r2 = requests.post(url2, json={"contents": [{"parts": [{"text": prompt[:1500]}]}]}, timeout=20).json()
+                if "candidates" in r2 and len(r2["candidates"]) > 0:
+                    return r2["candidates"][0]["content"]["parts"][0]["text"] + "\n\n✅ Gemini Se Bana Hai"
+            except:
+                continue
+    low = prompt.lower()
     if "script" in low:
-        return local_script_for_mode(mode, topic, extra) + "\n\n⚡ Local Script - Gemini Busy Tha"
+        return local_script_for_mode(mode, topic, extra) + "\n\n⚡ Local Script - Dono AI Busy The"
     if "keyword" in low or "trend" in low:
-        return f"""Main Keyword: {topic} - Viral Chance 85%
-Baaki 29 Keywords: {topic} Vlog, {topic} Review, {topic} Prediction, {topic} Episode, {topic} Drama, {topic} Pakistani Drama, {topic} Today Episode, {topic} Kal Ki Episode, {topic} Agli Episode, {topic} Twist, {topic} Hero, {topic} Heroine, {topic} Villain, {topic} Story, {topic} Update, {topic} News, {topic} 2026, {topic} Urdu, {topic} Hindi, {topic} Funny, {topic} Emotional, {topic} Sad, {topic} Full Episode, {topic} Part 1, {topic} Part 2, {topic} Part 3, {topic} Promo, {topic} Teaser, {topic} Ending
-
-⚡ Local Keywords"""
+        return f"Main Keyword: {topic} - Viral Chance 85%\nBaaki 29 Keywords: {topic} Vlog, {topic} Review, {topic} Prediction, {topic} Episode, {topic} Drama, {topic} Pakistani Drama, {topic} Today Episode, {topic} Kal Ki Episode, {topic} Agli Episode, {topic} Twist, {topic} Hero, {topic} Heroine, {topic} Villain, {topic} Story, {topic} Update\n\n⚡ Local Keywords"
     if "title" in low:
-        return f"""1. {topic} - Ye Hua, Wo Hua, Aage Kya Hoga? | Shocking Twist | Score 94
-2. {topic} Ka Bara Raaz Khul Gaya! | Prediction | Score 90
-3. {topic} - Kal Ki Episode Me Ye Hua! | Review | Score 89
-
-⚡ Local Title"""
+        return f"1. {topic} - Ye Hua, Wo Hua, Aage Kya Hoga? | Score 94\n2. {topic} Ka Raaz Khul Gaya! | Score 90\n3. {topic} - Kal Ki Episode Me Ye Hua! | Score 89\n\n⚡ Local Title"
     if "thumbnail" in low:
-        return f"""Thumbnail 1 - Score 93 - Text: "{topic}!" - Red + Yellow - Shocked Face
-Thumbnail 2 - Score 90 - Text: "Aage Kya Hoga?" - Blue + White - Serious Face
-Thumbnail 3 - Score 86 - Text: "Raaz Khul Gaya!" - Green + Black - Smiling Face
-
-⚡ Local Thumbnail"""
+        return f"Thumbnail 1 - Score 93 - Text: '{topic}!' - Red + Yellow\nThumbnail 2 - Score 90 - Text: 'Aage Kya Hoga?' - Blue + White\nThumbnail 3 - Score 86 - Text: 'Raaz Khul Gaya!' - Green + Black\n\n⚡ Local Thumbnail"
     return local_script_for_mode(mode, topic, extra)
 
 def get_quran_data(surah_choice):
     surah_map={"Surah Yaseen":36,"Surah Rehman":55,"Surah Mulk":67,"Ayatul Kursi":2}
     return surah_map.get(surah_choice, 36)
 
-st.markdown('<div class="topbar"><div><b style="font-size:28px;">🎬 ZENIQ</b> <span style="background:white;color:#7C3AED;padding:2px 10px;border-radius:20px;font-size:12px;">FINAL v2 - 7 MODE</span></div><div>7 MODE | 20 Video Roz | FREE</div></div>', unsafe_allow_html=True)
+st.markdown('<div class="topbar"><div><b style="font-size:28px;">🎬 ZENIQ</b> <span style="background:white;color:#7C3AED;padding:2px 10px;border-radius:20px;font-size:12px;">FINAL v3 - 7 MODE + PASTE SCRIPT</span></div><div>7 MODE | 20 Video Roz | FREE | Groq + Local</div></div>', unsafe_allow_html=True)
 st.write(f"Videos Today: {st.session_state.videos_today} / 20 - Baaki: {20 - st.session_state.videos_today}")
 st.progress(st.session_state.videos_today/20)
 st.write("")
 
-st.header("STEP 1: VIDEO KA TYPE CHUNO - 7 MODE - NAYA WALA ADDED")
-st.write("Video Kaisi Chahiye? Ek Chunno - Naya Wala 7th Mode Neeche Hai - Drama Review Wala")
+st.header("STEP 1: VIDEO KA TYPE CHUNO - 7 MODE")
 c1,c2,c3=st.columns(3)
 with c1:
     if st.button("🎙️ Single Video"):
@@ -218,29 +172,28 @@ with c2:
 with c3:
     if st.button("😂 Comedy Show"):
         st.session_state.mode="Comedy Show"; st.rerun()
-    st.markdown('<div class="mode-card mode-comedy"><div style="font-size:40px;">😂</div><h3>Comedy Show</h3><p>Bablu + Chacha<br>2 Men - 2 Voices<br>Short 40 Sec / 60 Sec / Long 8 Min</p></div>', unsafe_allow_html=True)
+    st.markdown('<div class="mode-card mode-comedy"><div style="font-size:40px;">😂</div><h3>Comedy Show</h3><p>Bablu + Chacha<br>2 Men<br>Short / Long 8 Min</p></div>', unsafe_allow_html=True)
 c4,c5,c6=st.columns(3)
 with c4:
     if st.button("🎭 Drama"):
         st.session_state.mode="Drama"; st.rerun()
-    st.markdown('<div class="mode-card mode-drama"><div style="font-size:40px;">🎭</div><h3>Drama</h3><p>3-4 Character<br>Pakistani Drama Jaisa<br>Part 1,2,3</p></div>', unsafe_allow_html=True)
+    st.markdown('<div class="mode-card mode-drama"><div style="font-size:40px;">🎭</div><h3>Drama</h3><p>3-4 Character<br>Pakistani Drama<br>Part 1,2,3</p></div>', unsafe_allow_html=True)
 with c5:
     if st.button("🚶 Vlog"):
         st.session_state.mode="Vlog"; st.rerun()
-    st.markdown('<div class="mode-card mode-vlog"><div style="font-size:40px;">🚶</div><h3>Vlog</h3><p>1 Ya 2 Character<br>Visit + Explain<br>Short / Long</p></div>', unsafe_allow_html=True)
+    st.markdown('<div class="mode-card mode-vlog"><div style="font-size:40px;">🚶</div><h3>Vlog</h3><p>1 Ya 2 Character<br>Visit + Explain</p></div>', unsafe_allow_html=True)
 with c6:
     if st.button("🕌 Quran Recitation"):
         st.session_state.mode="Quran Recitation"; st.rerun()
-    st.markdown('<div class="mode-card mode-quran"><div style="font-size:40px;">🕌</div><h3>Quran Recitation</h3><p>Quran.com Wala<br>Safe + Monetize<br>Arabic + Urdu Tarjuma</p></div>', unsafe_allow_html=True)
+    st.markdown('<div class="mode-card mode-quran"><div style="font-size:40px;">🕌</div><h3>Quran Recitation</h3><p>Quran.com Wala<br>Safe + Monetize</p></div>', unsafe_allow_html=True)
 st.write("")
-# ===== NAYA MODE - 7th - DRAMA REVIEW =====
-st.markdown("### ⭐ NAYA MODE - 7th - DRAMA REVIEW + PREDICTION - 1 CHARACTER ⭐")
+st.markdown("### ⭐ NAYA MODE - 7th - DRAMA REVIEW + PREDICTION ⭐")
 col_new1, col_new2 = st.columns([1, 2])
 with col_new1:
-    if st.button("🎬 Drama Review + Prediction\n1 Character - Beth Kar Batayega"):
+    if st.button("🎬 Drama Review + Prediction"):
         st.session_state.mode="Drama Review + Prediction"; st.rerun()
 with col_new2:
-    st.markdown('<div class="mode-card mode-review"><div style="font-size:40px;">🎬</div><h3>DRAMA REVIEW + PREDICTION - NAYA!</h3><p>1 Character - Beth Kar Batayega | Ye Hua, Wo Hua, Aage Kya Hoga?<br>Drama Ka Review + Agli Episode Ki Prediction | Short 40 Sec / 60 Sec / Long 8 Min / 15 Min</p></div>', unsafe_allow_html=True)
+    st.markdown('<div class="mode-card mode-review"><div style="font-size:40px;">🎬</div><h3>DRAMA REVIEW + PREDICTION - NAYA!</h3><p>1 Character - Beth Kar Batayega | Ye Hua, Wo Hua, Aage Kya Hoga?</p></div>', unsafe_allow_html=True)
 
 st.success(f"✅ Selected Mode: {st.session_state.mode}")
 st.write("---")
@@ -251,7 +204,7 @@ st.session_state.topic=topic
 duration=st.selectbox("Video Kitni Lambi Ho?", ["Short 40 Sec","Short 60 Sec","Long 8 Min","Long 15 Min","30 Min","1 Ghanta"] if st.session_state.mode=="Podcast Video" else ["Short 40 Sec","Short 60 Sec","Long 8 Min","Long 15 Min"])
 extra_info=""
 if st.session_state.mode=="Drama Review + Prediction":
-    st.markdown('<div class="review-box"><h2>🎬 DRAMA REVIEW + PREDICTION - 1 CHARACTER - Beth Kar Batayega</h2><p>Ye Mode Sirf Drama Review Ke Liye Hai - 1 Aadmi Beth Kar Batayega: Ye Hua, Wo Hua, Aage Kya Hoga?</p></div>', unsafe_allow_html=True)
+    st.markdown('<div class="review-box"><h2>🎬 DRAMA REVIEW + PREDICTION - 1 Character - Beth Kar Batayega</h2><p>Ye Hua, Wo Hua, Aage Kya Hoga?</p></div>', unsafe_allow_html=True)
     st.write("")
     drama_name=st.selectbox("Konsa Drama?", ["Meem Se Mohabbat","Jaan Nisar","Kaffara","Noor Jahan","Jaan E Jahan","Apna Drama Likho"])
     if drama_name=="Apna Drama Likho": drama_name=st.text_input("Apna Drama Likho", "Meem Se Mohabbat")
@@ -260,11 +213,6 @@ if st.session_state.mode=="Drama Review + Prediction":
     style=st.selectbox("Style Kaisa?", ["Beth Kar Samjhana - Serious + Funny Mix","Emotional - Dukh Wala","Funny - Mazak Wala","Suspense Wala - Aage Kya Hoga?"])
     extra_info=f"Drama: {drama_name} - {episode} - {review_type} - Style: {style}"
     st.info(f"Selected: {extra_info}")
-    st.write("Is Mode Me Script Aisi Hogi:")
-    st.write("- **Part 1 - YE HUA:** Pichli Episode Me Kya Hua?")
-    st.write("- **Part 2 - WO HUA:** Detail Me - Hero Ne Kya Kiya? Heroine Ne Kya Kiya? Villain Ne Kya Kiya?")
-    st.write("- **Part 3 - AAGE KYA HOGA?:** Prediction - Agli Episode Me Kya Hoga? Twist Kya Aayega?")
-    st.write("- **End:** Tumko Kya Lagta Hai? Comment Me Batao - Tumhari Prediction Kya Hai?")
 elif st.session_state.mode=="Quran Recitation":
     st.markdown('<div class="quran-box"><h2>🕌 QURAN - Quran.com Wala</h2><p>Avatar BAND - Music BAND - Sirf Arabic + Tarjuma + Background</p></div>', unsafe_allow_html=True)
     surah=st.selectbox("Konsi Surah?", ["Surah Yaseen","Surah Rehman","Surah Mulk","Ayatul Kursi","Apni Likho"])
@@ -272,6 +220,15 @@ elif st.session_state.mode=="Quran Recitation":
     qari=st.selectbox("Konsa Qari? [Quran.com Wala]", ["Mishary Rashid Alafasy - Quran.com","Abdul Basit - Quran.com","Abdul Rahman Al-Sudais - Quran.com"])
     extra_info=f"{surah} - Qari: {qari}"
     st.info(f"Selected: {extra_info}")
+    st.write(f"Quran.com Surah Number: {get_quran_data(surah)} - Audio Quran.com Se Aayega")
+    if st.button("Quran.com Se Ayat Dekho"):
+        try:
+            surah_num=get_quran_data(surah)
+            r=requests.get(f"https://api.quran.com/api/v4/chapters/{surah_num}", timeout=10).json()
+            st.write(f"Surah: {r['chapter']['name_simple']} - Ayat: {r['chapter']['verses_count']}")
+            st.success("✅ Quran.com Se Connected Hai")
+        except:
+            st.write(f"Surah {surah} - Audio Quran.com Se Aayega")
 elif st.session_state.mode=="Vlog":
     char_count=st.selectbox("Kitne Character?", ["1","2"])
     kahan=st.selectbox("Kahan Gaye Ho?", ["Sea View","Saddar","Gaon","Faisal Masjid","Apni Jagah Likho"])
@@ -296,7 +253,7 @@ if st.button("Step 2 - Keywords + Viral Chance Nikalo"):
         kw_res=ai(f"Give 30 best keywords for topic {topic} mode {st.session_state.mode}. Main keyword 1 High Search Low Competition. Viral chance %. If low, suggest 3 new topics.", topic=topic, mode=st.session_state.mode, extra=extra_info)
     st.write(kw_res)
     viral=random.randint(75, 94) if st.session_state.mode=="Drama Review + Prediction" else random.randint(65, 92)
-    st.markdown(f"<h2>🔥 VIRAL CHANCE: {viral}% - Drama Review Hamesha Zyada Chalta Hai!</h2>", unsafe_allow_html=True)
+    st.markdown(f"<h2>🔥 VIRAL CHANCE: {viral}%</h2>", unsafe_allow_html=True)
     st.progress(viral/100)
     st.session_state.main_kw=topic
     st.write(f"**Main Keyword: {st.session_state.main_kw}**")
@@ -317,16 +274,84 @@ if st.button("Top 10 Video Dekho"):
             st.write(ai(f"Top 10 video for {topic}", topic=topic))
 
 st.write("---")
+# ===== STEP 4 - PASTE YOUR OWN SCRIPT - FULL =====
 st.header("STEP 4: SCRIPT - PUNCTUATION LAZMI + MODE KE HISAB SE")
-st.write("Script Me Ye Sab Lazmi: , . ? ! ... Hahaha / Hmm / Ohh")
-if st.button("Step 4 - Script Banao"):
-    with st.spinner("Script Likh Raha Hoon..."):
-        script=ai(f"Write full script for mode {st.session_state.mode} topic {topic} duration {duration} extra {extra_info}. Use punctuation , . ? ! ... Hahaha Hmm Ohh. For Drama Review: Part 1 Ye Hua, Part 2 Wo Hua Detail, Part 3 Aage Kya Hoga Prediction, End Comment Sawal. In Urdu + English mix.", topic=topic, mode=st.session_state.mode, extra=extra_info)
-    st.session_state.script=script
-    st.write(script)
-    st.code(script)
-    if st.session_state.mode=="Drama Review + Prediction":
-        st.success("✅ Drama Review Script Ready - 3 Part Me Hai: Ye Hua + Wo Hua + Aage Kya Hoga?")
+st.write("Script Me Ye Sab Lazmi: , Comma | . Full Stop | ? Sawal | ! Josh | ... Suspense | Hahaha / Hmm / Ohh")
+script_choice = st.radio("Script Kahan Se Aayegi?", ["🤖 AI Se Banao - Zeniq Khud Banayega", "✍️ Paste Your Own Script - Meri Apni Script Hai"], horizontal=True)
+if script_choice == "🤖 AI Se Banao - Zeniq Khud Banayega":
+    if st.button("Step 4 - Script Banao - AI Se"):
+        with st.spinner("Script Likh Raha Hoon..."):
+            script = ai(f"Write full script for mode {st.session_state.mode} topic {topic} duration {duration} extra {extra_info}. Use punctuation , . ? ! ... Hahaha Hmm Ohh. For Drama Review: Part 1 Ye Hua, Part 2 Wo Hua Detail, Part 3 Aage Kya Hoga Prediction, End Comment Sawal. In Urdu + English mix.", topic=topic, mode=st.session_state.mode, extra=extra_info)
+        st.session_state.script = script
+        st.write(script)
+        st.code(script)
+else:
+    st.markdown('<div class="paste-box"><h3>✍️ PASTE YOUR OWN SCRIPT - Tumhari Apni Script</h3><p>Apni Script Yahan Paste Kar Do - Zeniq Usi Par Kaam Karega - Voice, Avatar, Editing Sab Usi Script Se Hoga</p></div>', unsafe_allow_html=True)
+    st.write("")
+    st.write("Misaal - Drama Review Ke Liye Aisi Script Paste Karo:")
+    st.code("""Assalam O Alaikum Doston...! Aaj hum baat karenge Meem Se Mohabbat Episode 20 ke baare me...!
+Ye Hua - Kal ki episode me Hero ne ye kiya...!
+Wo Hua - Heroine ne wo kiya...!
+Aage Kya Hoga? - Mujhe lagta hai agli episode me ye hoga...!
+Tumko kya lagta hai? Comment me batao...!""")
+    pasted_script = st.text_area("✍️ Apni Script Yahan Paste Karo - Poori Script", placeholder="Yahan apni poori script paste karo... Jaise: Assalam O Alaikum Doston...! Aaj hum baat karenge...! Ye hua...! Wo hua...! Aage kya hoga...?", height=300, key="pasted_script_area")
+    col_p1, col_p2 = st.columns(2)
+    with col_p1:
+        if st.button("✅ Meri Script Use Karo - Isi Par Video Banao"):
+            if pasted_script and len(pasted_script.strip()) > 20:
+                st.session_state.script = pasted_script
+                st.success(f"✅ Tumhari Script Save Ho Gayi! {len(pasted_script)} Characters - Ab Zeniq Isi Script Par Kaam Karega!")
+                st.write("---")
+                st.subheader("📋 Tumhari Script - Preview")
+                st.write(pasted_script)
+                st.code(pasted_script)
+                st.write("---")
+                st.subheader("🔍 Punctuation Check")
+                if "," in pasted_script:
+                    st.markdown('<div class="good">✅ Comma , Hai - Good</div>', unsafe_allow_html=True)
+                else:
+                    st.markdown('<div class="bad">❌ Comma , Nahi Hai - Comma Lagao</div>', unsafe_allow_html=True)
+                if "." in pasted_script:
+                    st.markdown('<div class="good">✅ Full Stop . Hai - Good</div>', unsafe_allow_html=True)
+                else:
+                    st.markdown('<div class="bad">❌ Full Stop . Nahi Hai - Full Stop Lagao</div>', unsafe_allow_html=True)
+                if "?" in pasted_script:
+                    st.markdown('<div class="good">✅ Question Mark ? Hai - Good</div>', unsafe_allow_html=True)
+                else:
+                    st.markdown('<div class="bad">❌ Question Mark ? Nahi Hai - ? Lagao</div>', unsafe_allow_html=True)
+                if "!" in pasted_script:
+                    st.markdown('<div class="good">✅ Exclamation ! Hai - Good</div>', unsafe_allow_html=True)
+                else:
+                    st.markdown('<div class="bad">❌ Exclamation ! Nahi Hai - ! Lagao</div>', unsafe_allow_html=True)
+                if "..." in pasted_script:
+                    st.markdown('<div class="good">✅ Teen Dots ... Hain - Good</div>', unsafe_allow_html=True)
+                else:
+                    st.markdown('<div class="bad">❌ Teen Dots ... Nahi Hain - ... Lagao</div>', unsafe_allow_html=True)
+                if any(w in pasted_script for w in ["Hahaha", "Hmm", "Ohh"]):
+                    st.markdown('<div class="good">✅ Hahaha / Hmm / Ohh Hai - Good</div>', unsafe_allow_html=True)
+                else:
+                    st.markdown('<div class="bad">❌ Hahaha / Hmm / Ohh Nahi Hai - Hahaha Lagao</div>', unsafe_allow_html=True)
+                words = len(pasted_script.split())
+                est_time = words / 150
+                st.write(f"📊 Words: {words} - Andaza Time: {est_time:.1f} Minute - Duration: {duration}")
+                if st.session_state.mode == "Drama Review + Prediction":
+                    if "Ye Hua" in pasted_script or "ye hua" in pasted_script.lower():
+                        st.markdown('<div class="good">✅ YE HUA Wala Part Hai - Good</div>', unsafe_allow_html=True)
+                    else:
+                        st.markdown('<div class="bad">❌ YE HUA Wala Part Nahi Hai - Ye Hua Likho</div>', unsafe_allow_html=True)
+                    if "Aage" in pasted_script or "aage" in pasted_script.lower():
+                        st.markdown('<div class="good">✅ AAGE KYA HOGA Wala Part Hai - Good</div>', unsafe_allow_html=True)
+                    else:
+                        st.markdown('<div class="bad">❌ AAGE KYA HOGA Wala Part Nahi Hai - Prediction Likho</div>', unsafe_allow_html=True)
+            else:
+                st.error("❌ Script Bohat Chhoti Hai - Kam Se Kam 20 Lafz Ki Script Paste Karo")
+    with col_p2:
+        if st.button("🗑️ Script Clear Karo"):
+            st.session_state.script = ""
+            st.rerun()
+    if st.session_state.script and script_choice == "✍️ Paste Your Own Script - Meri Apni Script Hai":
+        st.write("---")
+        st.info(f"✅ Abhi Jo Script Save Hai, Wo Use Hogi - {len(st.session_state.script)} Characters - STEP 5 Voice, STEP 7 Avatar, STEP 10 Final - Sab Isi Script Se Banega")
 
 st.write("---")
 st.header("STEP 5: VOICE OVER - HUMANIZE")
@@ -334,12 +359,11 @@ if st.session_state.mode=="Quran Recitation":
     st.markdown('<div class="quran-box"><h3>Quran Voice - 2 Voices - Qari Quran.com Se, Tarjuma Clone Voice Se</h3></div>', unsafe_allow_html=True)
     st.audio("https://download.quranicaudio.com/quran/mishaari_raashid_al_3afaasee/001001.mp3")
 elif st.session_state.mode=="Drama Review + Prediction":
-    st.markdown('<div class="review-box"><h3>🎬 Drama Review Voice - 1 Character - Beth Kar Bolega</h3><p>1 Voice - Tumhari Awaz Ya Clone Voice - Serious + Funny Mix - Beth Kar Samjhayega - Jaise Tum Baat Kar Rahe Ho</p></div>', unsafe_allow_html=True)
+    st.markdown('<div class="review-box"><h3>🎬 Drama Review Voice - 1 Character - Beth Kar Bolega</h3><p>1 Voice - Tumhari Awaz Ya Clone Voice - Serious + Funny Mix</p></div>', unsafe_allow_html=True)
     v1=st.selectbox("Voice 1 - Review Wala", ["Tumhari Clone Voice - Best Hai Drama Review Ke Liye","Islamic Male - Deep","Vlogger - Energetic","Young Boy - Funny"])
-    st.write("Voice Clone - Apni 30 Sec Awaz Upload Karo - Taake Review Tumhari Awaz Me Lage")
     uploaded_voice=st.file_uploader("Apni 30 Sec Awaz Upload Karo", type=["mp3","wav"], key="review_voice")
     if uploaded_voice:
-        st.success("✅ Voice Clone Upload Ho Gayi - Ab Review Tumhari Awaz Me Bolega")
+        st.success("✅ Voice Clone Upload Ho Gayi")
         st.audio(uploaded_voice)
 else:
     voice_engine=st.selectbox("Voice Engine", ["Edge TTS - Free - Best","Google Cloud TTS","gTTS - Free"])
@@ -348,7 +372,10 @@ else:
     if uploaded_voice: st.audio(uploaded_voice)
 st.write("Humanize: Saans Lena + Zor Dena + Comma Par Thora Rukna, Full Stop Par Zyada Rukna")
 if st.button("Voice Over Banao"):
-    st.success("✅ Voice Over Ready (Demo) - Real Me Edge TTS Se Banega")
+    if st.session_state.script:
+        st.success(f"✅ Voice Over Ready - Tumhari Script Se Banega - {len(st.session_state.script)} Characters - Comma Par Thora Rukega, Full Stop Par Zyada Rukega")
+    else:
+        st.success("✅ Voice Over Ready (Demo) - Pehle STEP 4 Me Script Banao Ya Paste Karo")
 
 st.write("---")
 st.header("STEP 6: PHOTO + VIDEOS")
@@ -358,15 +385,12 @@ if photo_source=="AI Se Banao - FLUX":
     if st.button("FLUX Se Photo Banao"):
         st.write(ai(f"FLUX prompt for {topic}", topic=topic))
 elif photo_source=="Pexels Se Lo - Free":
-    st.write("Pexels Se Free - Sample:")
     st.image("https://images.unsplash.com/photo-1512632578888-169bbbc64f33?w=600", use_container_width=True)
 else:
     up=st.file_uploader("Apni Photo Upload Karo", type=["jpg","png","jpeg"])
     if up: st.image(up, use_container_width=True)
 if st.session_state.mode=="Drama Review + Prediction":
-    st.info("Drama Review Ke Liye: Drama Ki Clips / Photos - Hero / Heroine / Villain Ki Photo - Episode Ke Scene Ki Photo - Background Me Drama Ka Poster")
-elif st.session_state.mode=="Drama":
-    st.info("Drama: Har Scene Alag - Ghar / Bazaar / School")
+    st.info("Drama Review Ke Liye: Drama Ki Clips / Photos - Hero / Heroine / Villain Ki Photo - Episode Ke Scene Ki Photo")
 elif st.session_state.mode=="Quran Recitation":
     st.info("Quran: Makkah / Madina / Masjid / Aasman")
 
@@ -375,12 +399,11 @@ st.header("STEP 7: AVATAR - HUMANIZE")
 if st.session_state.mode=="Quran Recitation":
     st.markdown('<div class="quran-box"><h3>🚫 QURAN ME AVATAR BAND HAI</h3></div>', unsafe_allow_html=True)
 elif st.session_state.mode=="Drama Review + Prediction":
-    st.markdown('<div class="review-box"><h3>🎬 Drama Review Avatar - 1 Character - Beth Kar Batayega</h3><p>1 Avatar - Betha Hua - Haath Se Ishara Karega - "Ye Hua, Wo Hua" - Munh Hilega - Aankhen Jhapkenge - Sir Hilayega</p></div>', unsafe_allow_html=True)
+    st.markdown('<div class="review-box"><h3>🎬 Drama Review Avatar - 1 Character - Beth Kar Batayega</h3><p>1 Avatar - Betha Hua - Haath Se Ishara Karega - Twist Par Shocked Face</p></div>', unsafe_allow_html=True)
     avatar_choice=st.selectbox("Review Wala Avatar Kaunsa?", ["Tumhara Apna Avatar - Apni Photo Upload Karo (Best Hai)","Vlogger - Beth Kar Batayega","Islamic Male - Beth Kar Batayega","Young Boy - Funny Review","Old Man - Samajhdaar Review","Avatar Band Karo - Sirf Voice + Drama Clips"])
     if avatar_choice=="Tumhara Apna Avatar - Apni Photo Upload Karo (Best Hai)":
         av_photo=st.file_uploader("Apni Photo - Review Avatar Ke Liye", type=["jpg","png"])
         if av_photo: st.image(av_photo, width=200)
-    st.write("Humanize: Beth Kar Bolega, Haath Hilayega, Chehra - Jab Twist Batayega To Shocked Face, Jab Funny Batayega To Hasega")
 else:
     avatar_choice=st.selectbox("Avatar Chuno", ["Islamic Male","Hijab Female","Young Boy","Old Man","Hero","Heroine","Ammi","Villain","Vlogger","Apni Photo Upload Karo","Avatar Band Karo"])
     st.write("Humanize: Lipsync + Aankhen Jhapakna + Sir Hilana + Haath Hilana")
@@ -395,9 +418,8 @@ st.header("STEP 9: EDITING")
 if st.session_state.mode=="Quran Recitation":
     st.markdown('<div class="quran-box"><h3>QURAN ME MUSIC BAND HAI</h3><p>Tarteeb: Arabic Ayat -> Qari Awaz -> 1 Sec Rukega -> Tarjuma Voice -> Tarjuma Screen -> Background -> Agli Ayat</p></div>', unsafe_allow_html=True)
 elif st.session_state.mode=="Drama Review + Prediction":
-    st.write("Drama Review Editing: Drama Ki Clips + Tumhara Avatar Beth Kar Bolega + Subtitles + Subscribe Button")
     music_choice=st.selectbox("Music?", ["Zeniq Ka Free Music - Suspense - Prediction Ke Liye Best","Zeniq Ka Free Music - Emotional","Zeniq Ka Free Music - Drama","Continue Without Music"])
-    st.write(f"Selected: {music_choice} - Prediction Wale Part Me Suspense Music Aayega - Review Wale Part Me Halka Music")
+    st.write(f"Selected: {music_choice}")
 else:
     music_choice=st.selectbox("Music Chuno", ["Apna Music Upload Karo","Zeniq Ka Free Music - Emotional","Zeniq Ka Free Music - Islamic","Zeniq Ka Free Music - Suspense","Zeniq Ka Free Music - Motivational","Zeniq Ka Free Music - Sad","Zeniq Ka Free Music - Comedy","Zeniq Ka Free Music - Drama","Continue Without Music"])
     st.write(f"Selected: {music_choice}")
@@ -410,6 +432,8 @@ if st.button("Final Video Banao + 3 Shorts Auto"):
     else:
         st.session_state.videos_today += 1
         st.success(f"✅ Final Video Ban Gayi! {st.session_state.videos_today}/20")
+        if st.session_state.script:
+            st.write(f"Script Used: {len(st.session_state.script)} Characters - Tumhari Script Se Bani Hai ✅")
         st.write("Long Video: Ready")
         st.write("Short 1: Best Hissa - 40 Sec - Auto Cut")
         st.write("Short 2: Second Best - 40 Sec")
@@ -441,8 +465,6 @@ if st.button("Step 11 - Title + Thumbnail + Description + Tags Banao"):
     st.subheader("Tags: 30 Tags - Pehla Tag = Main Keyword")
     tags_res=ai(f"Give 30 tags for {topic} first tag {main_kw}", topic=topic)
     st.write(tags_res); st.code(tags_res)
-    if st.session_state.mode=="Drama Review + Prediction":
-        st.info("Drama Review Ke Liye Extra Tags: Drama Review, Drama Prediction, Drama Update, Drama Today Episode, Drama Twist")
 
 st.write("---")
 st.header("STEP 12: ZENIQ SCORE + FIX + A/B TESTING")
@@ -482,4 +504,4 @@ else:
         st.success(f"✅ Upload Ho Gayi! Platform: {platform} (Demo)")
 
 st.write("---")
-st.markdown("<p style='text-align:center;'>🔒 ZENIQ FINAL v2 - 7 MODE WALA | Drama Review + Prediction - NAYA | Quran.com Wala | 20 Video Roz | FREE</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center;'>🔒 ZENIQ FINAL v3 - 7 MODE + PASTE YOUR OWN SCRIPT | Quran.com Wala | Drama Review + Prediction | 20 Video Roz | FREE</p>", unsafe_allow_html=True)
