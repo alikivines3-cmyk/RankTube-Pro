@@ -5,7 +5,6 @@ st.set_page_config(page_title="RANKTUBE PRO", page_icon="📈", layout="wide")
 st.title("📈 RANKTUBE PRO - ASLI DATA WALA")
 st.write("Ab Ye Naqli Nahi, Asli YouTube Data Dikhaega")
 
-# Keys Secrets se lena
 try:
     YOUTUBE_KEY = st.secrets["YOUTUBE_API_KEY"]
     GEMINI_KEY = st.secrets["GEMINI_API_KEY"]
@@ -23,9 +22,7 @@ if st.button("Asli Data Lao"):
     elif not channel_id:
         st.warning("Pehle Channel ID Likho")
     else:
-        # Channel ID se Search karna
         url = f"https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id={channel_id}&key={YOUTUBE_KEY}"
-        # Agar @ wala naam hai to search API use karo
         if channel_id.startswith("@"):
             url = f"https://www.googleapis.com/youtube/v3/search?part=snippet&q={channel_id}&type=channel&key={YOUTUBE_KEY}"
             r = requests.get(url).json()
@@ -38,7 +35,6 @@ if st.button("Asli Data Lao"):
                 st.stop()
         else:
             r = requests.get(url).json()
-        
         if "items" in r and len(r["items"]) > 0:
             data = r["items"][0]
             stats = data["statistics"]
@@ -51,23 +47,24 @@ if st.button("Asli Data Lao"):
             st.write(snip.get("description", "")[:300])
             st.success("Ye Asli Data Hai - YouTube Se Aaya Hai!")
         else:
-            st.error("Channel Nahi Mila. Channel ID Sahi Likho. Channel ID Kaise Milega? YouTube Studio -> Settings -> Channel -> Advanced Settings Me Hota Hai")
+            st.error("Channel Nahi Mila. Channel ID Sahi Likho.")
 
-# Purane Tabs bhi rakhe hain
-
+st.write("---")
 topic = st.text_input("🔍 Topic Likho - AI Se Title Banwao", "Sea View")
 if st.button("AI Se Title Banwao"):
     if not GEMINI_KEY:
         st.warning("Pehle Gemini Key Secrets Me Daalo")
     else:
-gem_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key={GEMINI_KEY}"        payload = {"contents": [{"parts": [{"text": f"Pakistani YouTube ke liye {topic} par 5 viral title banao, Urdu + English mix me, high CTR wale"}]}]}
+        gem_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key={GEMINI_KEY}"
+        payload = {"contents": [{"parts": [{"text": f"Pakistani YouTube ke liye {topic} par 5 viral title banao, Urdu + English mix me, high CTR wale"}]}]}
         gr = requests.post(gem_url, json=payload).json()
         try:
             text = gr["candidates"][0]["content"]["parts"][0]["text"]
             st.success("AI Ne Ye Title Banaye:")
             st.write(text)
         except:
-            st.error("Gemini Key Me Masla Hai - Key Sahi Hai? Secrets Me Check Karo")
+            st.error("Gemini Me Masla Hai")
             st.write(gr)
+
 st.write("---")
 st.write("Made With ❤️ - RANKTUBE PRO")
