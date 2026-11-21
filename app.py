@@ -54,14 +54,14 @@ if st.button("Asli Data Lao"):
             st.error("Channel Nahi Mila. Channel ID Sahi Likho. Channel ID Kaise Milega? YouTube Studio -> Settings -> Channel -> Advanced Settings Me Hota Hai")
 
 # Purane Tabs bhi rakhe hain
-st.write("---")
+
 topic = st.text_input("🔍 Topic Likho - AI Se Title Banwao", "Sea View")
 if st.button("AI Se Title Banwao"):
     if not GEMINI_KEY:
         st.warning("Pehle Gemini Key Secrets Me Daalo")
     else:
-        # Gemini API call
-gem_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_KEY}"        payload = {"contents": [{"parts": [{"text": f"Pakistani YouTube ke liye {topic} par 5 viral title banao, Urdu + English mix me, high CTR wale"}]}]}
+        gem_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_KEY}"
+        payload = {"contents": [{"parts": [{"text": f"Pakistani YouTube ke liye {topic} par 5 viral title banao, Urdu + English mix me, high CTR wale"}]}]}
         gr = requests.post(gem_url, json=payload).json()
         try:
             text = gr["candidates"][0]["content"]["parts"][0]["text"]
@@ -70,6 +70,5 @@ gem_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-f
         except:
             st.error("Gemini Key Me Masla Hai - Key Sahi Hai? Secrets Me Check Karo")
             st.write(gr)
-
 st.write("---")
 st.write("Made With ❤️ - RANKTUBE PRO")
