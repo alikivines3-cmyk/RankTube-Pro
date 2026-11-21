@@ -60,8 +60,7 @@ if st.button("AI Se Title Banwao"):
     if not GEMINI_KEY:
         st.warning("Pehle Gemini Key Secrets Me Daalo")
     else:
-        gem_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_KEY}"
-        payload = {"contents": [{"parts": [{"text": f"Pakistani YouTube ke liye {topic} par 5 viral title banao, Urdu + English mix me, high CTR wale"}]}]}
+gem_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key={GEMINI_KEY}"        payload = {"contents": [{"parts": [{"text": f"Pakistani YouTube ke liye {topic} par 5 viral title banao, Urdu + English mix me, high CTR wale"}]}]}
         gr = requests.post(gem_url, json=payload).json()
         try:
             text = gr["candidates"][0]["content"]["parts"][0]["text"]
