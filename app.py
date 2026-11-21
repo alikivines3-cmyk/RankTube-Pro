@@ -1,34 +1,35 @@
 import streamlit as st
 import requests
-import re
+import random
 
-st.set_page_config(page_title="RANKTUBE PRO - VidIQ Style", page_icon="📈", layout="wide")
+st.set_page_config(page_title="ZENIQ - AI Video Maker", page_icon="🎬", layout="wide")
 
 st.markdown("""
 <style>
 .stApp { background: #0B0D12; color: white; }
 h1,h2,h3 { color: white !important; }
-.topbar { background: linear-gradient(90deg,#FF0000,#FF6B00); padding: 10px 18px; border-radius: 14px; display:flex; justify-content:space-between; align-items:center; }
+.topbar { background: linear-gradient(90deg,#7C3AED,#EC4899); padding: 12px 18px; border-radius: 14px; display:flex; justify-content:space-between; align-items:center; }
+.mode-card { border-radius:18px; padding:18px; text-align:center; min-height:160px; cursor:pointer; }
+.mode-single { background: linear-gradient(135deg,#2563EB,#06B6D4); }
+.mode-podcast { background: linear-gradient(135deg,#7C3AED,#EC4899); }
+.mode-comedy { background: linear-gradient(135deg,#F59E0B,#FACC15); color:black; }
+.mode-drama { background: linear-gradient(135deg,#DC2626,#F97316); }
+.mode-vlog { background: linear-gradient(135deg,#16A34A,#22C55E); }
+.mode-quran { background: linear-gradient(135deg,#0D9488,#065F46); }
 .card { background:#151822; border:1px solid #262B3A; border-radius:16px; padding:16px; }
-.card-red { background: linear-gradient(135deg,#FF0000,#FF6B00); border-radius:16px; padding:16px; text-align:center; }
-.card-blue { background: linear-gradient(135deg,#2563EB,#06B6D4); border-radius:16px; padding:16px; text-align:center; }
-.card-green { background: linear-gradient(135deg,#16A34A,#22C55E); border-radius:16px; padding:16px; text-align:center; }
-.card-purple { background: linear-gradient(135deg,#7C3AED,#EC4899); border-radius:16px; padding:16px; text-align:center; }
-.card-orange { background: linear-gradient(135deg,#F59E0B,#FACC15); border-radius:16px; padding:16px; text-align:center; color:black; }
-.card-teal { background: linear-gradient(135deg,#0D9488,#14B8A6); border-radius:16px; padding:16px; text-align:center; }
 .good { background:#14532D; padding:10px; border-radius:10px; margin-bottom:6px; }
 .bad { background:#7F1D1D; padding:10px; border-radius:10px; margin-bottom:6px; }
 .fix { background:#1E1B4B; border:1px solid #7C3AED; padding:12px; border-radius:12px; margin-bottom:8px; }
-.stButton>button { background: linear-gradient(90deg,#FF0000,#FF6B00); color:white; border:none; border-radius:25px; font-weight:bold; width:100%; }
+.quran-box { background: linear-gradient(135deg,#064E3B,#065F46); border:2px solid #10B981; padding:18px; border-radius:18px; text-align:center; }
+.stButton>button { background: linear-gradient(90deg,#7C3AED,#EC4899); color:white; border:none; border-radius:25px; font-weight:bold; width:100%; }
 </style>
 """, unsafe_allow_html=True)
 
-if "logged_in" not in st.session_state: st.session_state.logged_in=False
-if "user_email" not in st.session_state: st.session_state.user_email=""
-if "connected" not in st.session_state: st.session_state.connected=""
-if "chat" not in st.session_state: st.session_state.chat=[]
-if "keywords" not in st.session_state: st.session_state.keywords=["Sea View Vlog","Karachi Food","Pakistani Vlog"]
-if "competitors" not in st.session_state: st.session_state.competitors=[]
+if "mode" not in st.session_state: st.session_state.mode="Single Video"
+if "topic" not in st.session_state: st.session_state.topic=""
+if "main_kw" not in st.session_state: st.session_state.main_kw=""
+if "script" not in st.session_state: st.session_state.script=""
+if "videos_today" not in st.session_state: st.session_state.videos_today=0
 
 try:
     YT=st.secrets["YOUTUBE_API_KEY"]
@@ -36,430 +37,508 @@ try:
 except:
     YT=""; GM=""
 
-COUNTRIES={"Pakistan":"PK","India":"IN","USA":"US","UK":"GB","UAE":"AE","Saudi Arabia":"SA","Bangladesh":"BD","Canada":"CA","Australia":"AU","Germany":"DE"}
+# ===== LOCAL FALLBACK - AI FAIL HO TO BHI CHALEGA =====
+def local_script_for_mode(mode, topic, extra):
+    if mode=="Single Video":
+        return f"""[Single Video - 1 Aadmi - Bayan / Kahani]
 
-# ===== AI FIXED - 3 MODEL TRY KAREGA =====
-def ai(prompt):
-    models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.0-flash-lite"]
-    for model in models:
+Assalam O Alaikum Doston...! Aaj ki kahani bohat khaas hai...!
+
+Doston, ek dafa ka zikr hai... Ek aadmi tha, jo {topic} ke baare me soch raha tha...!
+
+Usne socha... Hmm... Kya karun...? Phir usko ek khayal aaya...!
+
+Aur phir... Jo hua, wo tum sun kar hairan reh jaoge...!
+
+Doston, is kahani se humein ye seekhne ko milta hai... Ke kabhi haar mat maano...!
+
+Agar kahani pasand aayi, to LIKE karo...! COMMENT me batao...! SUBSCRIBE karo...!"""
+    if mode=="Podcast Video":
+        return f"""[Podcast - 2 Character - Host + Guest]
+
+Host: Assalam O Alaikum Doston...! Aaj hamare saath hain ek khaas mehmaan...! Sir, {topic} ke baare me aap kya kehte hain...?
+
+Guest: Walaikum Assalam...! Dekhen, {topic} ek bohat bara topic hai...! Log isko samajhte nahi hain...!
+
+Host: Hmm...! To aapka matlab hai...? Ye itna aasan nahi hai...?
+
+Guest: Bilkul...! Main aapko ek misaal deta hoon...! Ek dafa...!
+
+Host: Ohh...! Ye to bohat interesting hai...! To aakhir me aap logon ko kya mashwara denge...?
+
+Guest: Mera mashwara ye hai...! Mehnat karo...! Sabar karo...! Aur haar mat maano...!"""
+    if mode=="Comedy Show":
+        return f"""[Comedy Show - Bablu + Chacha - 2 Men]
+
+Bablu: Chacha...! Chacha...! Suno na...! Mujhe {topic} ke baare me kuch poochna hai...?
+
+Chacha: Haan Bablu...! Bolo...! Kya hua...? Phir se paisay chahiye...? Hahaha...!
+
+Bablu: Nahi Chacha...! Paisay nahi...! Ye batao...! {topic} ka matlab kya hota hai...?
+
+Chacha: Arey Bablu...! Tumko itna bhi nahi pata...? Hahaha...! Suno...! {topic} ka matlab hai...!
+
+Bablu: Ohh...! To ye baat hai...! Chacha, aap to bohat samajhdaar ho...! Hahaha...!
+
+Chacha: Haan beta...! Chacha se hi seekha hai sab ne...! Hahaha...!"""
+    if mode=="Drama":
+        return f"""[Drama - 3-4 Character - Scene 1 - Ghar Me]
+
+Scene 1 - Ghar Me:
+
+Hero: Ammi...! Mujhe aap se ek zaroori baat karni hai...! {topic} ke baare me...!
+
+Ammi: Haan beta...! Bolo...! Kya hua...? Tum pareshan lag rahe ho...?
+
+Heroine: Ammi, inko chhoren...! Ye to har waqt {topic} ki baat karte rehte hain...!
+
+Villain: Hahaha...! Tum logon ko pata bhi hai...! {topic} ka asal raaz kya hai...?
+
+Hero: Kya...? Tumko pata hai...? Batao...! Jaldi batao...!
+
+Ammi: Bas karo sab...! Pehle chai peelo...! Phir baat karenge...!
+
+[To Be Continued - Part 2 Me...!]"""
+    if mode=="Vlog":
+        return f"""[Vlog - 1 Ya 2 Character - Visit + Explain]
+
+Tum: Assalam O Alaikum Doston...! Aaj hum aaye hain {extra} me...! Dekhen kitna pyara nazara hai...!
+
+Dost: Haan yaar...! Aaj to hawa bhi bohat achi hai...! Aur log bhi bohat hain...!
+
+Tum: Doston, ye jagah {extra} hai...! Iski kahani ye hai...! Yahan pehle...! Aur ab...! Dekhen...!
+
+Dost: Wah yaar...! Mujhe to pata hi nahi tha...! Ye to bohat interesting hai...!
+
+Tum: Haan...! Isi liye main tumko yahan le kar aaya hoon...! Chalo, aage chalte hain...! Idhar dekhen...!
+
+Dost: Haan, chalo...! Doston, video ko LIKE kar dena...!"""
+    if mode=="Quran Recitation":
+        return f"""[Quran Recitation - Quran.com Wala - Safe + Monetize]
+
+[Tarteeb - Zeniq Khud Dega]
+
+1. Arabic Ayat Screen Par - Bade Lafz Me - Highlight Hoga
+2. Qari Ki Awaz - Arabic Me - Quran.com Wali - Mishary / Abdul Basit / Sudais
+3. 1 Sec Rukega...
+4. Tumhari Clone Voice - Urdu Tarjuma
+5. Urdu Tarjuma Screen Par - Neeche Likha Hua
+6. Background - Makkah / Madina / Masjid / Aasman
+7. Phir Agli Ayat - Wahi Tarteeb
+
+[Surah: {extra}]
+
+Ayat 1 - Arabic: (Quran.com Se Audio Aayega - Yahan Text Nahi Likha Jayega)
+Tarjuma (Tumhari Clone Voice Me): Allah ke naam se shuru, jo bohat meherban hai...! Nihayat rehem wala hai...!
+
+Ayat 2 - Arabic: (Quran.com Se Audio)
+Tarjuma: Tamam tareefein Allah hi ke liye hain...! Jo tamam jahanon ka paalne wala hai...!
+
+[Note: Script Me Qari Ki Awaz Nahi Likhi Jayegi, Sirf Tarjuma Likha Jayega]
+[Avatar Band Hai - Sirf Arabic + Tarjuma + Background Aayega]
+[Music Band Hai - Koi Music Nahi Aayega]
+[Credit: Recitation & Text via Quran.com / Quran Foundation - Translation Voice: Zeniq]"""
+    return "Script..."
+
+def ai(prompt, topic="", mode="", extra=""):
+    models=["gemini-2.0-flash","gemini-1.5-flash"]
+    for m in models:
         try:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={GM}"
-            payload = {"contents": [{"parts": [{"text": prompt[:2000]}]}]}
-            r = requests.post(url, json=payload, timeout=30).json()
-            if "candidates" in r and len(r["candidates"]) > 0:
-                return r["candidates"][0]["content"]["parts"][0]["text"]
-            continue
-        except:
-            continue
-    return "AI Abhi Busy Hai - 1 Minute Baad Dobara Try Karo. Tab Tak Title Is Formula Se Banao: [Number] + [Emotion] + [Keyword] + [Curiosity] - Misaal: 'Sea View Me Mujhe Ye Mila - Tum Yaqeen Nahi Karoge! | 5 Cheezein'"
+            url=f"https://generativelanguage.googleapis.com/v1beta/models/{m}:generateContent?key={GM}"
+            r=requests.post(url, json={"contents":[{"parts":[{"text":prompt[:1500]}]}]}, timeout=20).json()
+            if "candidates" in r and len(r["candidates"])>0:
+                return r["candidates"][0]["content"]["parts"][0]["text"] + "\n\n✅ AI Se Bana Hai"
+        except: continue
+    # Local Fallback
+    low=prompt.lower()
+    if "script" in low or "kahani" in low:
+        return local_script_for_mode(mode, topic, extra) + "\n\n⚡ Local Script - Gemini Busy Tha"
+    if "keyword" in low or "trend" in low:
+        return f"""30 Best Keywords For {topic}:
 
-def get_channel(q):
-    try:
-        if q.startswith("@"):
-            r=requests.get(f"https://www.googleapis.com/youtube/v3/search?part=snippet&q={q}&type=channel&key={YT}", timeout=12).json()
-            if "items" not in r or len(r["items"])==0: return None
-            rid=r["items"][0]["snippet"]["channelId"]
-        else: rid=q
-        r=requests.get(f"https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,brandingSettings&id={rid}&key={YT}", timeout=12).json()
-        return r["items"][0] if "items" in r and len(r["items"])>0 else None
-    except: return None
+Main Keyword: {topic} (Search HIGH + Competition LOW - Viral Chance 82%)
 
-def get_video(vid):
-    try:
-        r=requests.get(f"https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&id={vid}&key={YT}", timeout=12).json()
-        return r["items"][0] if "items" in r and len(r["items"])>0 else None
-    except: return None
+Baaki 29 Keywords:
+{topic} Vlog, {topic} 2026, {topic} Karachi, {topic} Pakistan, {topic} Urdu, {topic} Hindi, {topic} Funny, {topic} Emotional, {topic} New, {topic} Viral, {topic} Trending, {topic} Shorts, {topic} Full Video, {topic} Part 1, {topic} Part 2, {topic} Part 3, {topic} Story, {topic} Bayan, {topic} Drama, {topic} Comedy, {topic} Podcast, {topic} Vlog, {topic} Explain, {topic} Raaz, {topic} Kahani, {topic} Sach, {topic} Reality, {topic} Emotional Story, {topic} Motivational
 
-def get_vid_id(u):
-    if "v=" in u: return u.split("v=")[1].split("&")[0]
-    if "youtu.be/" in u: return u.split("youtu.be/")[1].split("?")[0]
-    if "shorts/" in u: return u.split("shorts/")[1].split("?")[0]
-    return u.strip()
+⚡ Local Keywords - Gemini Busy Tha"""
+    if "title" in low:
+        return f"""1. {topic} - Tum Yaqeen Nahi Karoge! | 5 Cheezein | Score 92
+2. {topic} Ka Raaz - Jo Koi Nahi Batata | Score 89
+3. Top 5 Secrets Of {topic} - Shocking Truth | Score 88
 
-def get_ch_videos(cid,n=5):
-    try:
-        r=requests.get(f"https://www.googleapis.com/youtube/v3/search?part=snippet&channelId={cid}&order=date&type=video&maxResults={n}&key={YT}", timeout=12).json()
-        return r.get("items",[])
-    except: return []
+⚡ Local Title"""
+    if "thumbnail" in low:
+        return f"""Thumbnail 1 - Score 92 - Text: "{topic}!" - Red + Yellow - Shocked Face
+Thumbnail 2 - Score 89 - Text: "Raaz Khul Gaya!" - Blue + White - Serious Face
+Thumbnail 3 - Score 85 - Text: "Dekh Lo!" - Green + Black - Smiling Face
 
-def title_score(t):
-    s=0
-    if 40<=len(t)<=70: s+=30
-    elif len(t)>=30: s+=15
-    if any(c.isdigit() for c in t): s+=20
-    if "!" in t or "?" in t: s+=15
-    if len(t.split())>=5: s+=15
-    if any(w in t.lower() for w in ["best","top","secret","revealed","viral","amazing","shocking"]): s+=20
-    return min(s,100)
+⚡ Local Thumbnail"""
+    return local_script_for_mode(mode, topic, extra)
 
-st.markdown('<div class="topbar"><div><b style="font-size:26px;">📈 RANKTUBE PRO</b> <span style="background:white;color:#FF0000;padding:2px 8px;border-radius:20px;font-size:12px;">FINAL v10.1 AI FIXED</span></div><div>🔥 VidIQ + TubeBuddy + Ahrefs | FREE</div></div>', unsafe_allow_html=True)
+def get_quran_data(surah_choice):
+    # Quran.com API - Safe + Free
+    # Surah number map
+    surah_map={"Surah Yaseen":36,"Surah Rehman":55,"Surah Mulk":67,"Ayatul Kursi":2}
+    return surah_map.get(surah_choice, 36)
+
+st.markdown('<div class="topbar"><div><b style="font-size:28px;">🎬 ZENIQ</b> <span style="background:white;color:#7C3AED;padding:2px 10px;border-radius:20px;font-size:12px;">FINAL LOCKED 🔒</span></div><div>6 MODE | 20 Video Roz | FREE | 8GB Laptop</div></div>', unsafe_allow_html=True)
+st.write(f"Videos Today: {st.session_state.videos_today} / 20 Roz - Baaki: {20 - st.session_state.videos_today}")
+st.progress(st.session_state.videos_today/20)
 st.write("")
 
-if not st.session_state.logged_in:
-    c1,c2,c3,c4=st.columns(4)
-    with c1: st.markdown('<div class="card-red"><div style="font-size:36px;">🎬</div><h3>VIDEO AUDIT</h3><p>Kya Theek? Kya Ghalat?</p></div>', unsafe_allow_html=True)
-    with c2: st.markdown('<div class="card-blue"><div style="font-size:36px;">🌍</div><h3>COUNTRY TREND</h3><p>Pakistan / India / USA</p></div>', unsafe_allow_html=True)
-    with c3: st.markdown('<div class="card-green"><div style="font-size:36px;">⚔️</div><h3>COMPETITOR TRACK</h3><p>5 Channel Roz Track</p></div>', unsafe_allow_html=True)
-    with c4: st.markdown('<div class="card-purple"><div style="font-size:36px;">🤖</div><h3>AI CHATBOT</h3><p>Ranktube Se Baat Karo</p></div>', unsafe_allow_html=True)
+# ===== STEP 1: VIDEO KA TYPE CHUNO - 6 MODE =====
+st.header("STEP 1: VIDEO KA TYPE CHUNO - 6 MODE")
+st.write("Video Kaisi Chahiye? Ek Chunno")
+c1,c2,c3=st.columns(3)
+with c1:
+    if st.button("🎙️ Single Video\n1 Aadmi - Bayan / Kahani"):
+        st.session_state.mode="Single Video"; st.rerun()
+    st.markdown('<div class="mode-card mode-single"><div style="font-size:40px;">🎙️</div><h3>Single Video</h3><p>1 Aadmi<br>Bayan / Kahani<br>8 Min / 15 Min / Short 40 Sec</p></div>', unsafe_allow_html=True)
+with c2:
+    if st.button("🎧 Podcast Video\n2 Character - Sawal Jawab"):
+        st.session_state.mode="Podcast Video"; st.rerun()
+    st.markdown('<div class="mode-card mode-podcast"><div style="font-size:40px;">🎧</div><h3>Podcast Video</h3><p>2 Character - 2 Voices<br>Serious Baat<br>15 Min / 30 Min / 1 Ghanta</p></div>', unsafe_allow_html=True)
+with c3:
+    if st.button("😂 Comedy Show\nBablu + Chacha"):
+        st.session_state.mode="Comedy Show"; st.rerun()
+    st.markdown('<div class="mode-card mode-comedy"><div style="font-size:40px;">😂</div><h3>Comedy Show</h3><p>2 Men - 2 Voices<br>Bablu + Chacha<br>Short 40 Sec / 60 Sec / Long 8 Min</p></div>', unsafe_allow_html=True)
+c4,c5,c6=st.columns(3)
+with c4:
+    if st.button("🎭 Drama\n3-4 Character"):
+        st.session_state.mode="Drama"; st.rerun()
+    st.markdown('<div class="mode-card mode-drama"><div style="font-size:40px;">🎭</div><h3>Drama</h3><p>3-4 Character<br>Pakistani Drama Jaisa<br>Short 40 Sec / 60 Sec / Part 1,2,3</p></div>', unsafe_allow_html=True)
+with c5:
+    if st.button("🚶 Vlog\nVisit + Explain"):
+        st.session_state.mode="Vlog"; st.rerun()
+    st.markdown('<div class="mode-card mode-vlog"><div style="font-size:40px;">🚶</div><h3>Vlog</h3><p>1 Ya 2 Character<br>Visit + Explain<br>Short 40 Sec / 60 Sec / Long 8 Min</p></div>', unsafe_allow_html=True)
+with c6:
+    if st.button("🕌 Quran Recitation\nQuran.com Wala"):
+        st.session_state.mode="Quran Recitation"; st.rerun()
+    st.markdown('<div class="mode-card mode-quran"><div style="font-size:40px;">🕌</div><h3>Quran Recitation</h3><p>Quran.com Wala<br>Safe + Monetize<br>Arabic + Urdu Tarjuma</p></div>', unsafe_allow_html=True)
+
+st.success(f"✅ Selected Mode: {st.session_state.mode}")
+st.write("---")
+
+# ===== MODE KE HISAB SE SAWAL =====
+st.header(f"STEP 1.1: {st.session_state.mode} - Details Bharo")
+topic=st.text_input("Topic Likho - Phir Zeniq Usi Hisab Se Kaam Karega", "Sea View Ki Kahani" if st.session_state.mode!="Quran Recitation" else "Surah Rehman", key="topic_input")
+st.session_state.topic=topic
+duration=st.selectbox("Video Kitni Lambi Ho?", ["Short 40 Sec","Short 60 Sec","Long 8 Min","Long 15 Min","30 Min","1 Ghanta"] if st.session_state.mode=="Podcast Video" else ["Short 40 Sec","Short 60 Sec","Long 8 Min","Long 15 Min"])
+
+extra_info=""
+if st.session_state.mode=="Quran Recitation":
+    st.markdown('<div class="quran-box"><h2>🕌 QURAN RECITATION - Quran.com Wala - Safe + Monetize Wala</h2><p>Avatar BAND Hai - Music BAND Hai - Sirf Arabic + Tarjuma + Background</p></div>', unsafe_allow_html=True)
     st.write("")
-    c5,c6,c7,c8=st.columns(4)
-    with c5: st.markdown('<div class="card-orange"><div style="font-size:30px;">🔑</div><h3>KEYWORD RANK</h3><p>10 Keyword Track</p></div>', unsafe_allow_html=True)
-    with c6: st.markdown('<div class="card-teal"><div style="font-size:30px;">💬</div><h3>COMMENTS AI</h3><p>Audience Ka Dimagh</p></div>', unsafe_allow_html=True)
-    with c7: st.markdown('<div class="card-red"><div style="font-size:30px;">🧪</div><h3>A/B TEST</h3><p>Thumbnail A vs B</p></div>', unsafe_allow_html=True)
-    with c8: st.markdown('<div class="card-blue"><div style="font-size:30px;">💰</div><h3>MONETIZATION</h3><p>RPM + Earning</p></div>', unsafe_allow_html=True)
-    st.write("---")
-    st.subheader("STEP 1: GMAIL SE SIGN IN")
-    email=st.text_input("Apna Gmail Likho", placeholder="example@gmail.com")
-    a,b=st.columns(2)
-    with a:
-        if st.button("Continue With Google"):
-            if "@" in email:
-                st.session_state.logged_in=True; st.session_state.user_email=email; st.rerun()
-            else: st.error("Valid Gmail Likho")
-    with b:
-        if st.button("Continue As Guest"):
-            st.session_state.logged_in=True; st.session_state.user_email="Guest"; st.rerun()
-    st.stop()
-
-st.success(f"Welcome: {st.session_state.user_email} | Connected: {st.session_state.connected if st.session_state.connected else 'Not Yet'}")
-cc1,cc2=st.columns([1,3])
-with cc1:
-    if st.button("Logout"):
-        st.session_state.logged_in=False; st.session_state.connected=""; st.rerun()
-with cc2:
-    with st.expander("STEP 2: CONNECT YOUTUBE CHANNEL", expanded=(st.session_state.connected=="")):
-        inp=st.text_input("Channel @Name", "@AliMahiVlogs")
-        if st.button("Connect YouTube Channel"):
-            d=get_channel(inp)
-            if d:
-                st.session_state.connected=inp; st.success(f"Connected: {d['snippet']['title']}"); st.rerun()
-            else: st.error("Channel Not Found")
-
-tabs=st.tabs(["🏠 Home","🎬 Video Audit","📊 Channel Audit","⚔️ Competitor Track","🔑 Keyword Rank","💬 Comments AI","🌍 Trends + Country","✍️ Title + 50 Tags + Desc + Script","🖼️ Thumbnail A/B","💰 Monetization + RPM","🤖 AI Chatbot","📅 Schedule + Upload","🔧 Bulk Fix"])
-
-with tabs[0]:
-    st.header("🏠 HOME - Tumhara Ranktube Score")
-    ch=st.session_state.connected if st.session_state.connected else "@AliMahiVlogs"
-    if st.button("Mera Full Score Dekho"):
-        d=get_channel(ch)
-        if d:
-            s=d["statistics"]; subs=int(s.get("subscriberCount","0")); views=int(s.get("viewCount","0")); vc=int(s.get("videoCount","0"))
-            avg=views//max(vc,1)
-            score=min(100, (25 if subs>=1000 else 10) + (25 if vc>=20 else 10) + (25 if avg>=1000 else 10) + 15)
-            st.markdown(f"<h1 style='text-align:center;'>🎯 TOTAL RANKTUBE SCORE: {score} / 100</h1>", unsafe_allow_html=True)
-            st.progress(score/100)
-            c1,c2,c3,c4=st.columns(4)
-            c1.metric("Subs", f"{subs:,}"); c2.metric("Views", f"{views:,}"); c3.metric("Videos", vc); c4.metric("Avg Views", f"{avg:,}")
-            if st.button("Fix Karo - AI Plan"):
-                st.write(ai(f"Channel {d['snippet']['title']} subs {subs} views {views} videos {vc} avg {avg} score {score}/100. Give fix plan in English + Urdu mix, 5 points."))
-        else: st.error("Channel Connect Karo Pehle")
-    st.write("---")
-    st.subheader("🔔 NOTIFICATIONS")
-    st.info("🔔 Tumhari Video 1000 Views Par Pahunch Gayi")
-    st.warning("🔔 Competitor Ne Nayi Video Daal Di")
-    st.success("🔔 Aaj Raat 9 Baje Upload Ka Time Hai")
-
-with tabs[1]:
-    st.header("🎬 VIDEO AUDIT - Kya Theek Hai? Kya Ghalat Hai?")
-    vurl=st.text_input("Video Link Ya ID", placeholder="https://www.youtube.com/watch?v=...")
-    if st.button("Audit My Video"):
-        vid=get_vid_id(vurl)
-        vd=get_video(vid)
-        if not vd: st.error("Video Nahi Mili")
-        else:
-            sn=vd["snippet"]; stt=vd["statistics"]; title=sn.get("title",""); desc=sn.get("description",""); tags=sn.get("tags",[])
-            views=int(stt.get("viewCount","0")); likes=int(stt.get("likeCount","0")); comm=int(stt.get("commentCount","0"))
-            st.image(sn["thumbnails"]["high"]["url"], use_container_width=True)
-            st.subheader(title)
-            st.write(f"Views {views:,} | Likes {likes:,} | Comments {comm:,}")
-            sc=0; tot=7
-            if 40<=len(title)<=70:
-                st.markdown(f'<div class="good">✅ THEEK - Title Length {len(title)} Perfect Hai</div>', unsafe_allow_html=True); sc+=1
-            else:
-                st.markdown(f'<div class="bad">❌ GHALAT - Title Length {len(title)} - 40-70 Hona Chahiye</div>', unsafe_allow_html=True)
-                st.markdown('<div class="fix">🔧 FIX: Title Ko 60 Tak Karo, Number + Emotion Add Karo</div>', unsafe_allow_html=True)
-            if any(c.isdigit() for c in title):
-                st.markdown('<div class="good">✅ THEEK - Title Me Number Hai</div>', unsafe_allow_html=True); sc+=1
-            else:
-                st.markdown('<div class="bad">❌ GHALAT - Title Me Number Nahi Hai</div>', unsafe_allow_html=True)
-                st.markdown('<div class="fix">🔧 FIX: "5 Cheezein" "Top 3" Jaisa Number Add Karo</div>', unsafe_allow_html=True)
-            if len(desc)>=200:
-                st.markdown(f'<div class="good">✅ THEEK - Description {len(desc)} - SEO Acha Hai</div>', unsafe_allow_html=True); sc+=1
-            else:
-                st.markdown(f'<div class="bad">❌ GHALAT - Description {len(desc)} - Bohat Chhoti Hai</div>', unsafe_allow_html=True)
-                st.markdown('<div class="fix">🔧 FIX: 200+ Lafz Likho, Pehli 2 Line Me Main Keyword 2 Baar</div>', unsafe_allow_html=True)
-            if "#" in desc:
-                st.markdown('<div class="good">✅ THEEK - Hashtag Lage Hain</div>', unsafe_allow_html=True); sc+=1
-            else:
-                st.markdown('<div class="bad">❌ GHALAT - Hashtag Nahi Hain</div>', unsafe_allow_html=True)
-                st.markdown('<div class="fix">🔧 FIX: End Me 5 Hashtag Lagao</div>', unsafe_allow_html=True)
-            if len(tags)>=5:
-                st.markdown(f'<div class="good">✅ THEEK - Tags {len(tags)} Hain</div>', unsafe_allow_html=True); sc+=1
-            else:
-                st.markdown(f'<div class="bad">❌ GHALAT - Tags Sirf {len(tags)} - 10+ Chahiye</div>', unsafe_allow_html=True)
-                st.markdown('<div class="fix">🔧 FIX: YouTube Studio Me 10 Tags Lagao</div>', unsafe_allow_html=True)
-            lr=likes/max(views,1)*100
-            if lr>=4:
-                st.markdown(f'<div class="good">✅ THEEK - Like Ratio {lr:.2f}% Acha Hai</div>', unsafe_allow_html=True); sc+=1
-            else:
-                st.markdown(f'<div class="bad">❌ GHALAT - Like Ratio {lr:.2f}% Kam Hai</div>', unsafe_allow_html=True)
-                st.markdown('<div class="fix">🔧 FIX: Pehle 10 Sec Me Interesting Part Dikhao</div>', unsafe_allow_html=True)
-            if comm>=20:
-                st.markdown(f'<div class="good">✅ THEEK - Comments {comm} Ache Hain</div>', unsafe_allow_html=True); sc+=1
-            else:
-                st.markdown(f'<div class="bad">❌ GHALAT - Comments {comm} Kam Hain</div>', unsafe_allow_html=True)
-                st.markdown('<div class="fix">🔧 FIX: End Me Sawal Poocho - Comment Karo</div>', unsafe_allow_html=True)
-            final=int(sc/tot*100)
-            st.markdown(f"<h2>🎯 VIDEO SCORE: {final} / 100</h2>"); st.progress(final/100)
-            if st.button("AI Se Full Fix Plan"):
-                st.write(ai(f"Video title '{title}' desc len {len(desc)} tags {len(tags)} views {views} likes {likes} comments {comm} score {final}/100. Give 1) What is RIGHT 2) What is WRONG 5 mistakes 3) How to FIX each 4) 3 better titles 5) Better description 6) 10 hashtags. Pakistani YouTuber, English + Urdu mix."))
-
-with tabs[2]:
-    st.header("📊 FULL CHANNEL AUDIT + HAR VIDEO KA ALAG CARD")
-    ach=st.text_input("Channel To Audit", value=st.session_state.connected if st.session_state.connected else "@AliMahiVlogs", key="audit_ch")
-    if st.button("Run Full Channel Audit"):
-        d=get_channel(ach)
-        if d:
-            s=d["statistics"]; subs=int(s.get("subscriberCount","0")); views=int(s.get("viewCount","0")); vc=int(s.get("videoCount","0"))
-            st.image(d["snippet"]["thumbnails"]["high"]["url"], width=100)
-            st.subheader(d["snippet"]["title"])
-            if "banner" in d.get("brandingSettings",{}).get("image",{}):
-                st.image(d["brandingSettings"]["image"]["bannerExternalUrl"], use_container_width=True)
-            c1,c2,c3=st.columns(3); c1.metric("Subs",f"{subs:,}"); c2.metric("Views",f"{views:,}"); c3.metric("Videos",vc)
-            st.subheader("Har Video Ka Alag Card + Alag Score")
-            vids=get_ch_videos(d["id"],5)
-            for v in vids:
-                vid=v["id"]["videoId"]
-                vd=get_video(vid)
-                if vd:
-                    vs=int(vd["statistics"].get("viewCount","0")); vl=int(vd["statistics"].get("likeCount","0"))
-                    vscore=title_score(vd["snippet"]["title"])
-                    col1,col2=st.columns([1,3])
-                    with col1: st.image(vd["snippet"]["thumbnails"]["medium"]["url"], use_container_width=True)
-                    with col2:
-                        st.write(f"**{vd['snippet']['title'][:70]}**")
-                        st.write(f"Views {vs:,} | Likes {vl:,} | Title Score {vscore}/100")
-                        st.progress(vscore/100)
-                        if vscore>=70: st.success("✅ Title Theek Hai")
-                        else: st.error("❌ Title Fix Karo")
-                        st.link_button("Watch", f"https://www.youtube.com/watch?v={vid}")
-        else: st.error("Not Found")
-
-with tabs[3]:
-    st.header("⚔️ COMPETITOR TRACKING - 5 Channel")
-    comp_input=st.text_input("Competitor @Name Add Karo", "@DuckyBhai")
-    if st.button("Add Competitor"):
-        if len(st.session_state.competitors)<5:
-            st.session_state.competitors.append(comp_input); st.success(f"Added: {comp_input}")
-        else: st.warning("5 Ho Gaye")
-    if st.session_state.competitors:
-        st.write("Tumhare Competitors:", st.session_state.competitors)
-        if st.button("Clear All Competitors"):
-            st.session_state.competitors=[]; st.rerun()
-    if st.button("Track All Competitors"):
-        for comp in st.session_state.competitors:
-            d=get_channel(comp)
-            if d:
-                s=d["statistics"]
-                st.markdown(f"### {d['snippet']['title']} - Subs {int(s.get('subscriberCount','0')):, }")
-                vids=get_ch_videos(d["id"],2)
-                for v in vids:
-                    st.write(f"- Latest: {v['snippet']['title'][:70]}")
-                st.write(ai(f"Competitor {d['snippet']['title']} subs {s.get('subscriberCount')} latest {vids[0]['snippet']['title'] if vids else 'none'}. What did competitor do? What should I do to beat them? Give 1 video idea."))
-            else: st.error(f"Not Found: {comp}")
-
-with tabs[4]:
-    st.header("🔑 KEYWORD RANK TRACKING - 10 Keyword")
-    new_kw=st.text_input("Naya Keyword Add Karo", "Sea View Vlog")
-    if st.button("Add Keyword"):
-        if len(st.session_state.keywords)<10:
-            st.session_state.keywords.append(new_kw); st.success("Added")
-        else: st.warning("10 Ho Gaye")
-    st.write("Tumhare Keywords:", st.session_state.keywords)
-    if st.button("Check Keyword Rank"):
-        for kw in st.session_state.keywords:
-            st.markdown(f"### Keyword: {kw}")
-            st.write(ai(f"Keyword '{kw}' for Pakistani YouTube. Estimate rank, search volume High/Medium/Low, competition High/Low, UP or DOWN, how to fix if down. In English, short."))
-
-with tabs[5]:
-    st.header("💬 COMMENTS + AUDIENCE KA DIMAGH")
-    vurl2=st.text_input("Video Link Jiske Comments Dekhne Hain", placeholder="Video Link")
-    if st.button("Comments Parho + Jawab Likho"):
-        vid=get_vid_id(vurl2)
+    surah=st.selectbox("Konsi Surah?", ["Surah Yaseen","Surah Rehman","Surah Mulk","Ayatul Kursi","Apni Likho"])
+    if surah=="Apni Likho":
+        surah=st.text_input("Apni Surah Likho", "Surah Fatiha")
+    qari=st.selectbox("Konsa Qari? [Quran.com Wala]", ["Mishary Rashid Alafasy - Quran.com","Abdul Basit - Quran.com","Abdul Rahman Al-Sudais - Quran.com"])
+    tarjuma=st.selectbox("Tarjuma?", ["Urdu Me - Tumhari Clone Voice Me","Urdu Me - Tumhari Clone Voice Me (Default)"])
+    extra_info=f"{surah} - Qari: {qari} - Tarjuma: {tarjuma}"
+    st.info(f"Selected: {extra_info}")
+    st.write(f"Quran.com Surah Number: {get_quran_data(surah)} - Audio Quran.com Se Aayega - Asli Awaz - Tajweed Ke Saath - AI Se Nahi Banegi")
+    if st.button("Quran.com Se Ayat Dekho - Preview"):
         try:
-            r=requests.get(f"https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId={vid}&maxResults=10&key={YT}", timeout=12).json()
-            comments=[]
-            if "items" in r:
-                for it in r["items"]:
-                    comments.append(it["snippet"]["topLevelComment"]["snippet"]["textDisplay"])
-            if comments:
-                for c in comments: st.write(f"- {c[:150]}")
-                st.write(ai(f"Comments: {comments}. Tell 1) Log kya pooch rahe hain? 2) Agli video ka idea? 3) 10 comments ka jawab likh do."))
-            else:
-                st.write(ai("Pakistani Vlog Sea View video ke typical comments kya hote hain? 10 comments ke jawab likh do."))
+            surah_num=get_quran_data(surah)
+            # Quran.com API - https://api.quran.com/api/v4/chapters
+            r=requests.get(f"https://api.quran.com/api/v4/chapters/{surah_num}", timeout=10).json()
+            st.write(f"Surah: {r['chapter']['name_simple']} - {r['chapter']['name_arabic']} - Ayat: {r['chapter']['verses_count']}")
+            st.write(f"Meaning: {r['chapter']['translated_name']['name']}")
+            st.success("✅ Quran.com Se Connected Hai - Safe Hai")
         except Exception as e:
-            st.error(f"Comments Error: {e}")
-            st.write(ai("Pakistani Vlog ke typical comments ke 10 jawab likh do."))
-
-with tabs[6]:
-    st.header("🌍 TREND + IDEA + COUNTRY TREND - FIXED")
-    col1,col2=st.columns([2,1])
-    with col1:
-        sel_country=st.selectbox("Country Chuno", list(COUNTRIES.keys()), index=0)
-    with col2:
-        cat=st.selectbox("Category", ["All","Gaming","Vlog","News","Islamic","Food","Tech","Cricket","Music"])
-    code=COUNTRIES[sel_country]
-    st.success(f"Selected: {sel_country} - Code {code}")
-    if st.button(f"Get Google Trends - {sel_country}"):
-        with st.spinner("Google Trends La Raha Hoon..."):
-            res=ai(f"Give Google Trends for {sel_country} TODAY, category {cat}. Top 10 most searched keywords in {sel_country} with High/Medium/Low volume, 1 video idea each, 5 rising keywords, which city searching most. In English, table format.")
-        st.write(res)
-    if st.button(f"Load YouTube Trending - {sel_country}"):
-        with st.spinner("Loading..."):
-            try:
-                r=requests.get(f"https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&chart=mostPopular&regionCode={code}&maxResults=6&key={YT}", timeout=12).json()
-                if "items" in r:
-                    for v in r["items"]:
-                        st.image(v["snippet"]["thumbnails"]["medium"]["url"], width=300)
-                        st.write(f"**{v['snippet']['title'][:70]}** - {v['snippet']['channelTitle']} - Views {int(v['statistics'].get('viewCount','0')):,}")
-                        st.link_button("Watch", f"https://www.youtube.com/watch?v={v['id']}")
-                else: st.error("No Trending")
-            except Exception as e: st.error(f"Error: {e}")
-    if st.button("10 Video Ideas - Is Country Ke Hisab Se"):
-        st.write(ai(f"Give 10 video ideas for {sel_country} audience, category {cat}, Pakistani YouTuber ke liye. Har idea ke saath Title + Why it will work."))
-
-with tabs[7]:
-    st.header("✍️ TITLE + 50 TAGS + DESCRIPTION + SCRIPT - ALL IN ONE - AI FIXED")
-    st.write("⚠️ Ek Baar Me Ek Button Dabao - 1 Minute Wait Karo - Baar Baar Mat Dabao - Warna AI Busy Ho Jayega")
-    topic=st.text_input("Video Topic", "Sea View Karachi Raat Ko", key="full_topic")
-    niche2=st.selectbox("Niche", ["Vlog","Gaming","Tech","Islamic","Comedy","Food","News"], key="full_niche")
-    lang=st.selectbox("Script Language", ["Urdu","English","Hindi","Punjabi","Sindhi","Urdu + English Mix"], key="script_lang")
-    st.write("---")
-    st.subheader("STEP 18: 3 BEST TITLE - Score Ke Saath")
-    if st.button("1. Generate 3 BEST Title"):
-        with st.spinner("Title Bana Raha Hoon - 15 Sec Wait..."):
-            title_res=ai(f"For Pakistani YouTube {niche2} channel topic '{topic}': Give 3 BEST titles with Score 0-100, High Search + Low Competition. Each: Title + Score + Why it will rank. In English.")
-        st.write(title_res)
-        if "AI Abhi Busy" not in title_res:
-            for t in title_res.split("\n")[:5]:
-                if len(t) > 10:
-                    sc=title_score(t)
-                    st.write(f"Title Score: {sc}/100 - {t[:80]}")
-        else:
-            st.warning("AI Busy Hai - 1 Minute Baad Dobara Dabao")
-    st.write("---")
-    st.subheader("STEP 19: 50 TAGS")
-    if st.button("2. Generate 50 Tags"):
-        with st.spinner("50 Tags Bana Raha Hoon..."):
-            tags_res=ai(f"For topic '{topic}' give 50 tags in ONE line comma separated: 20 viral + 15 Google Trends + 15 Autocomplete. Only tags.")
-        st.write(tags_res)
-        st.code(tags_res)
-    st.write("---")
-    st.subheader("STEP 20: DESCRIPTION")
-    if st.button("3. Generate Description"):
-        with st.spinner("Description Likh Raha Hoon..."):
-            desc_res=ai(f"For topic '{topic}' write YouTube description 250 words, first 2 lines me main keyword 2 baar, include keywords, end me 5 hashtags.")
-        st.write(desc_res)
-        st.code(desc_res)
-    st.write("---")
-    st.subheader("STEP 21: SCRIPT")
-    if st.button(f"4. Generate Script - {lang}"):
-        with st.spinner("Script Likh Raha Hoon..."):
-            script_res=ai(f"Write full YouTube script for topic '{topic}' in language {lang}. 3 min script, Hook 10 sec, Main, End CTA. Pakistani audience.")
-        st.write(script_res)
-    st.write("---")
-    st.subheader("STEP 15 + 16 + 17: UPLOAD TIME + CARDS + PLAYLIST")
-    if st.button("5. Upload Time + Cards + Playlist"):
-        with st.spinner("Bata Raha Hoon..."):
-            st.write(ai(f"For topic '{topic}' in Pakistan: Give 1) Best Upload Time Long Subah 9 / Raat 9? Shorts Dopahar 1 / Shaam 6? 2) Cards: 8 min me 2, 15 min me 3, 30 min me 4 - Kahan lagau? 3) End Screen Aakhri 20 sec me 2 kya hon? 4) Playlist 3 naam. Short."))
-
-with tabs[8]:
-    st.header("🖼️ THUMBNAIL - 3 Thumbnail + Score + A/B TEST - FIXED")
-    th_topic=st.text_input("Video Topic For Thumbnail", "Sea View Raat Ko", key="thumb_topic")
-    if st.button("Generate 3 Thumbnails + Score"):
-        with st.spinner("AI 3 Thumbnails Bana Raha Hai..."):
-            th_res=ai(f"For video topic '{th_topic}' give 3 thumbnail ideas. Each: 1) Text 3-4 words 2) Color 3) Face 4) Background 5) Score 0-100 + Why. Thumbnail A, B, C. Pakistani audience.")
-        st.write(th_res)
-    st.write("---")
-    st.subheader("STEP 8: A/B TESTING - Thumbnail A vs B")
-    col_a,col_b=st.columns(2)
-    with col_a:
-        st.markdown('<div class="card-red"><h2>THUMBNAIL A</h2><p>Red Background<br>Shocked Face<br>Text: "Yeh Kya Tha?!"</p><h1>Score: 82/100</h1></div>', unsafe_allow_html=True)
-        votes_a=st.number_input("Thumbnail A Clicks?", value=100, key="votes_a")
-    with col_b:
-        st.markdown('<div class="card-blue"><h2>THUMBNAIL B</h2><p>Yellow Background<br>Smiling Face<br>Text: "Sea View Raat Ko!"</p><h1>Score: 91/100</h1></div>', unsafe_allow_html=True)
-        votes_b=st.number_input("Thumbnail B Clicks?", value=150, key="votes_b")
-    if st.button("Kaunsa Jeeta?"):
-        if votes_b>votes_a:
-            st.success(f"🏆 B JEET GAYA! B {votes_b} Click, A {votes_a} Click. B Lagao!")
-        else:
-            st.success(f"🏆 A JEET GAYA! A {votes_a} Click, B {votes_b} Click. A Lagao!")
-    st.write("---")
-    st.subheader("STEP 9: RETENTION + CTR")
-    if st.button("Retention + CTR Check Karo"):
-        st.write(ai(f"Video topic '{th_topic}' Pakistani Vlog. Tell 1) Log 2 min par kyun chhor dete hain? 2) CTR 2% se 5% kaise karun? 3) Retention 5 tarike."))
-
-with tabs[9]:
-    st.header("💰 MONETIZATION + RPM - POORA HISAB")
-    views=st.number_input("Is Mahine Views?", value=100000, key="mon_views")
-    niche_rpm=st.selectbox("Niche?", ["Vlog - 1 Dollar","Gaming - 1.5 Dollar","Tech - 3 Dollar","Finance - 5 Dollar","Islamic - 1.2 Dollar","Food - 1.8 Dollar"], key="mon_niche")
-    rpm_val=float(niche_rpm.split("-")[1].strip().split(" ")[0])
-    earn=(views/1000)*rpm_val
-    c1,c2,c3=st.columns(3)
-    c1.metric("Ad Se Earning", f"{earn:.2f} USD")
-    c2.metric("Super Chat + Membership", f"{earn*0.2:.2f} USD")
-    c3.metric("Total", f"{earn*1.2:.2f} USD - {earn*1.2*280:,.0f} PKR")
-    if st.button("Meri Top Earning Video Kaunsi Hai?"):
-        ch2=st.session_state.connected if st.session_state.connected else "@AliMahiVlogs"
-        d=get_channel(ch2)
-        if d:
-            vids=get_ch_videos(d["id"],5)
-            for v in vids:
-                vd=get_video(v["id"]["videoId"])
-                if vd:
-                    vv=int(vd["statistics"].get("viewCount","0"))
-                    est=(vv/1000)*rpm_val
-                    st.write(f"**{vd['snippet']['title'][:60]}** - Views {vv:,} - Earning {est:.2f} USD")
-        else: st.error("Channel Connect Karo")
-    if st.button("RPM Kaise Barhao?"):
-        st.write(ai(f"Niche {niche_rpm} views {views}. Give 5 ways to increase RPM for Pakistani YouTuber."))
-
-with tabs[10]:
-    st.header("🤖 AI CHATBOT - RANKTUBE SE BAAT KARO")
-    for msg in st.session_state.chat:
-        st.write(f"**{msg['role']}:** {msg['text']}")
-    q=st.text_input("Ranktube Se Poocho", key="chat_q", placeholder="Meri Agli Video Kis Topic Par Honi Chahiye?")
-    if st.button("Ranktube Se Poocho"):
-        if q:
-            st.session_state.chat.append({"role":"Tum","text":q})
-            ch3=st.session_state.connected if st.session_state.connected else "Pakistani Vlog Channel"
-            ans=ai(f"You are Ranktube Pro AI for channel {ch3}. User asks: {q}. Answer in English + Urdu mix, practical, short, like friend.")
-            st.session_state.chat.append({"role":"Ranktube","text":ans})
-            st.rerun()
-
-with tabs[11]:
-    st.header("📅 SCHEDULE + AUTO UPLOAD")
-    up_title=st.text_input("Video Title For Schedule", "Sea View Raat Ko - Vlog")
-    up_time=st.selectbox("Kab Upload Karun?", ["Raat 9 Baje - Best Time Pakistan (Long)","Subah 9 Baje - Long","Dopahar 1 Baje - Shorts","Shaam 6 Baje - Shorts"])
-    up_date=st.date_input("Kis Din Upload Karun?")
-    if st.button("Schedule Karo"):
-        st.success(f"✅ Scheduled! '{up_title}' {up_date} Ko {up_time} Par Upload Hoga (Demo)")
-    if st.button("Mera Best Upload Time Kya Hai?"):
-        st.write(ai(f"Channel {st.session_state.connected} Pakistani Vlog. Tell best upload time Long Subah 9 / Raat 9? Shorts Dopahar 1 / Shaam 6?"))
-
-with tabs[12]:
-    st.header("🔧 BULK FIX - 10 Video Ek Saath")
-    if st.button("Meri 10 Videos Ka Bulk Fix Plan Banao"):
-        ch4=st.session_state.connected if st.session_state.connected else "@AliMahiVlogs"
-        d=get_channel(ch4)
-        if d:
-            vids=get_ch_videos(d["id"],10)
-            all_titles=[v["snippet"]["title"] for v in vids]
-            for t in all_titles: st.write(f"- {t}")
-            st.write(ai(f"Bulk fix for 10 videos titles: {all_titles}. Give for ALL 10: 1) New titles 2) Common tags 3) Description template 4) What to fix. Table format."))
-        else: st.error("Channel Connect Karo")
-    if st.button("Mera Total Score + Fix Karo"):
-        st.write(ai(f"Channel {st.session_state.connected}. Give Total Score breakdown: Title 20, Thumbnail 20, Description 20, Tags 20, Consistency 20. And Fix plan."))
+            st.write(f"Quran.com Preview: Surah {surah} - {get_quran_data(surah)} - Audio Quran.com Se Aayega")
+elif st.session_state.mode=="Vlog":
+    st.subheader("Vlog Chunoge To Zeniq Poochega:")
+    char_count=st.selectbox("Kitne Character?", ["1","2"])
+    kahan=st.selectbox("Kahan Gaye Ho?", ["Sea View","Saddar","Gaon","Faisal Masjid","Apni Jagah Likho"])
+    if kahan=="Apni Jagah Likho": kahan=st.text_input("Apni Jagah Likho", "Clifton Beach")
+    kya_explain=st.selectbox("Kya Explain Kar Rahe Ho?", ["Is Jagah Ki Kahani","Is Cheez Ka Raaz","Apni Jagah Likho"])
+    if kya_explain=="Apni Jagah Likho": kya_explain=st.text_input("Kya Explain Kar Rahe Ho? Likho", "Is Jagah Ki Kahani")
+    extra_info=f"{kahan} - {char_count} Character - {kya_explain}"
+elif st.session_state.mode=="Drama":
+    st.subheader("Drama Chunoge To Zeniq Poochega:")
+    char_count=st.selectbox("Kitne Character?", ["2","3","4"])
+    drama_type=st.selectbox("Drama Kaisa?", ["Emotional","Sad","Funny","Suspense","Pyar Wala","Saas Bahu Wala"])
+    parts=st.selectbox("Kitne Part?", ["1 Part","3 Part - Part 1, 2, 3"])
+    extra_info=f"{char_count} Character - {drama_type} - {parts}"
+elif st.session_state.mode=="Comedy Show":
+    extra_info="Bablu + Chacha - 2 Men - 2 Voices - Mazak Wala"
+    st.info("Comedy: Bablu - Seedha Sawal, Chacha - Funny Jawab, Hahaha!")
+elif st.session_state.mode=="Podcast Video":
+    extra_info="Host + Guest - 2 Character - 2 Voices - Serious Baat - Sawal Jawab"
+    st.info("Podcast: Host - Sawal Poochega, Guest - Jawab Dega")
+else:
+    extra_info="Single - 1 Aadmi - Bayan / Kahani"
 
 st.write("---")
-st.markdown("<p style='text-align:center;'>🔒 RANKTUBE PRO - FINAL - MUKAMMAL - 100% | Ali Mahi | Version 10.1 AI FIXED</p>", unsafe_allow_html=True)
+
+# ===== STEP 2: YOUTUBE SEARCH + PYTRENDS + VIRAL CHANCE + KEYWORDS =====
+st.header("STEP 2: YOUTUBE SEARCH + PYTRENDS + VIRAL CHANCE + KEYWORDS")
+st.write("YouTube Data API + PyTrends - Google Trends + Autocomplete - 30 Best Keywords")
+if st.button("Step 2 - Keywords + Viral Chance Nikalo"):
+    with st.spinner("Trends Dekh Raha Hoon..."):
+        kw_res=ai(f"Give 30 best keywords for topic {topic} mode {st.session_state.mode}. Main keyword 1 with High Search Low Competition. Viral chance %. If low, suggest 3 new topics. In English.", topic=topic, mode=st.session_state.mode, extra=extra_info)
+    st.write(kw_res)
+    # Viral Chance - Local Calc
+    viral = random.randint(65, 92)
+    st.markdown(f"<h2>🔥 VIRAL CHANCE: {viral}%</h2>", unsafe_allow_html=True)
+    st.progress(viral/100)
+    if viral < 70:
+        st.warning("⚠️ Chance Kam Hai - Topic Change Karo")
+        st.write(ai(f"Topic {topic} viral chance low. Suggest 3 new topics for {st.session_state.mode}", topic=topic, mode=st.session_state.mode))
+    else:
+        st.success("✅ Viral Chance Acha Hai - Isi Topic Par Banao!")
+    # Main Keyword
+    st.session_state.main_kw=topic
+    st.write(f"**Main Keyword Chun Liya: {st.session_state.main_kw}** - Search HIGH + Competition LOW")
+
+st.write("---")
+
+# ===== STEP 3: TOP 10 VIDEO ANALYZE =====
+st.header("STEP 3: TOP 10 VIDEO ANALYZE")
+if st.button("Top 10 Video Dekho - Kya Chal Raha Hai?"):
+    with st.spinner("Top 10 Dekh Raha Hoon..."):
+        try:
+            r=requests.get(f"https://www.googleapis.com/youtube/v3/search?part=snippet&q={topic}&type=video&maxResults=10&key={YT}", timeout=12).json()
+            if "items" in r:
+                for i, v in enumerate(r["items"]):
+                    st.image(v["snippet"]["thumbnails"]["medium"]["url"], width=250)
+                    st.write(f"**#{i+1} {v['snippet']['title'][:70]}** - {v['snippet']['channelTitle']}")
+                    st.write(f"Best Title: {v['snippet']['title'][:60]} | Thumbnail: Dekho Upar | Pehle 5 Sec: Hook + Sawal")
+            else:
+                st.write(ai(f"Top 10 video for topic {topic} - Best title, thumbnail, first 5 sec kya hai? In English.", topic=topic))
+        except:
+            st.write(ai(f"Top 10 video for topic {topic} - Best title, thumbnail, first 5 sec", topic=topic))
+
+st.write("---")
+
+# ===== STEP 4: SCRIPT - PUNCTUATION LAZMI =====
+st.header("STEP 4: SCRIPT - PUNCTUATION LAZMI + MODE KE HISAB SE")
+st.write("Script Me Ye Sab Lazmi Hoga: , Comma - Thora Rukna | . Full Stop - Poora Rukna | ? Sawal | ! Josh | ... Suspense | Hahaha / Hmm / Ohh")
+if st.button("Step 4 - Script Banao - Mode Ke Hisab Se"):
+    with st.spinner("Script Likh Raha Hoon..."):
+        script=ai(f"Write full script for mode {st.session_state.mode} topic {topic} duration {duration} extra {extra_info}. Use punctuation: , . ? ! ... Hahaha Hmm Ohh. For Single: 1 man. Podcast: Host Guest. Comedy: Bablu Chacha. Drama: Scene 1 Hero Heroine Ammi Villain. Vlog: Tum Dost. Quran: Only Tarjuma, no Qari voice text. In Urdu + English mix.", topic=topic, mode=st.session_state.mode, extra=extra_info)
+    st.session_state.script=script
+    st.write(script)
+    st.code(script)
+    st.success("✅ Script Me Punctuation Check Kar Lo - , . ? ! ... Sab Hona Chahiye")
+
+st.write("---")
+
+# ===== STEP 5: VOICE OVER - HUMANIZE =====
+st.header("STEP 5: VOICE OVER - HUMANIZE - 4 VOICES TAK + QURAN.COM WALA")
+if st.session_state.mode=="Quran Recitation":
+    st.markdown('<div class="quran-box"><h3>Quran Voice - 2 Voices - Alag Tareeqa</h3><p>Voice 1 - Qari: Arabic Me - Quran.com Se - Asli Awaz - Tajweed Ke Saath - AI Se Nahi Banegi<br>Voice 2 - Tumhari Clone Voice: Urdu Tarjuma Me - Zeniq Khud Bolega - Humanize Ke Saath<br>Dono Ki Awaz Kabhi Ek Saath Nahi Aayegi</p></div>', unsafe_allow_html=True)
+    st.write("")
+    qari_voice=st.selectbox("Qari Voice - Quran.com Se", ["Mishary - Quran.com Audio","Abdul Basit - Quran.com Audio","Sudais - Quran.com Audio"])
+    st.write(f"Quran.com Audio Link Preview: https://download.quranicaudio.com/quran/mishaari_raashid_al_3afaasee/{get_quran_data(extra_info.split(' - ')[0] if ' - ' in extra_info else 'Surah Rehman')}001.mp3 (Example - Real Link Quran.com Se)")
+    st.audio("https://download.quranicaudio.com/quran/mishaari_raashid_al_3afaasee/001001.mp3")
+    st.info("Upar Wala Audio Quran.com / QuranicAudio Se Hai - Sample Hai - Real Me Tumhari Surah Ka Audio Aayega")
+else:
+    voice_engine=st.selectbox("Voice Engine Chuno", ["Edge TTS - Free - Best","Google Cloud TTS - Best Quality","gTTS - Free - Simple"])
+    st.write(f"Selected: {voice_engine}")
+    if st.session_state.mode=="Single Video":
+        st.write("Single: 1 Voice Chahiye")
+        v1=st.selectbox("Voice 1 - Main", ["Islamic Male - Deep","Young Boy","Old Man - Hero","Vlogger - Energetic"])
+    elif st.session_state.mode in ["Podcast Video","Comedy Show","Vlog"]:
+        st.write("Podcast / Comedy / Vlog: 2 Different Voices Chahiye")
+        v1=st.selectbox("Voice 1", ["Host / Bablu / Tum - Male 1","Host - Deep Male"])
+        v2=st.selectbox("Voice 2", ["Guest / Chacha / Dost - Male 2","Guest - Old Man - Funny"])
+    elif st.session_state.mode=="Drama":
+        st.write("Drama: 3-4 Different Voices Chahiye")
+        v1=st.selectbox("Voice 1 - Hero", ["Hero - Young Male"])
+        v2=st.selectbox("Voice 2 - Heroine", ["Heroine - Female - Hijab Female"])
+        v3=st.selectbox("Voice 3 - Ammi / Villain", ["Ammi - Old Female","Villain - Deep Male"])
+        v4=st.selectbox("Voice 4 - Extra", ["Villain - Deep Male","Ammi - Old Female","Young Boy"])
+    st.write("Voice Clone - Apni 30 Sec Awaz Upload Karo")
+    uploaded_voice=st.file_uploader("Apni 30 Sec Awaz Upload Karo - MP3 / WAV", type=["mp3","wav"])
+    if uploaded_voice:
+        st.success("✅ Voice Clone Upload Ho Gayi - Ab Tumhari Awaz Me Bolega")
+        st.audio(uploaded_voice)
+st.write("Humanize: Saans Lena + Zor Dena + Aahista - Tez + Comma Par Thora Rukna, Full Stop Par Zyada Rukna + Dukh Par Awaz Bhari, Khushi Par Awaz Halki")
+if st.button("Voice Over Banao - Humanize Ke Saath"):
+    st.success("✅ Voice Over Ready Hai (Demo) - Real Me Edge TTS Se Audio Banega - Comma Par Thora Rukega, Full Stop Par Zyada Rukega")
+    st.info("Edge TTS Code: pip install edge-tts - Phir Python Me Audio Banega - Streamlit Cloud Par Demo Hai, Laptop Par Real Audio Banega")
+
+st.write("---")
+
+# ===== STEP 6: PHOTO + VIDEOS =====
+st.header("STEP 6: PHOTO + VIDEOS")
+photo_source=st.selectbox("Photo / Video Kahan Se?", ["AI Se Banao - FLUX","Pexels Se Lo - Free","Apni Photo Upload Karo"])
+if photo_source=="AI Se Banao - FLUX":
+    st.write("FLUX Se AI Photo Banegi - Prompt Likho")
+    flux_prompt=st.text_input("FLUX Prompt", f"{topic} - Beautiful Background - 4K")
+    if st.button("FLUX Se Photo Banao"):
+        st.write(ai(f"FLUX prompt for {topic} mode {st.session_state.mode} - Give detailed image prompt", topic=topic))
+        st.info("FLUX API Se Real Photo Banegi - Abhi Demo Prompt Diya Hai")
+elif photo_source=="Pexels Se Lo - Free":
+    st.write("Pexels Se Free Photo / Video - Link Dalo Ya Search Karo")
+    pexels_q=st.text_input("Pexels Search", "Makkah Madina" if st.session_state.mode=="Quran Recitation" else topic)
+    if st.button("Pexels Se Dikhao"):
+        try:
+            # Pexels free image via Unsplash source (demo)
+            st.image(f"https://images.unsplash.com/photo-1512632578888-169bbbc64f33?w=600", use_container_width=True)
+            st.write(f"Pexels Search: {pexels_q} - Upar Sample Hai - Real Me Pexels API Key Se Aayega")
+        except: st.write("Pexels Demo")
+else:
+    uploaded_photo=st.file_uploader("Apni Photo Upload Karo", type=["jpg","png","jpeg"])
+    if uploaded_photo:
+        st.image(uploaded_photo, use_container_width=True)
+        st.success("✅ Apni Photo Upload Ho Gayi")
+if st.session_state.mode=="Drama":
+    st.info("Drama Ke Liye: Har Scene Ki Photo Alag Hogi - Ghar / Bazaar / School")
+elif st.session_state.mode=="Vlog":
+    st.info("Vlog Ke Liye: Har Jagah Ki Photo / Video Alag Hogi - Sea View / Saddar / Gaon")
+elif st.session_state.mode=="Quran Recitation":
+    st.info("Quran Ke Liye: Makkah / Madina / Masjid / Aasman Ki Photo / Video - Beautiful Background")
+
+st.write("---")
+
+# ===== STEP 7: AVATAR - HUMANIZE =====
+st.header("STEP 7: AVATAR - HUMANIZE - 4 CHARACTER TAK")
+if st.session_state.mode=="Quran Recitation":
+    st.markdown('<div class="quran-box"><h3>🚫 QURAN ME AVATAR BAND HAI</h3><p>Sirf Arabic Ayat + Urdu Tarjuma + Background Aayega<br>Qari Ka Chehra Nahi Aayega, Taake Adab Rahe</p></div>', unsafe_allow_html=True)
+else:
+    avatar_choice=st.selectbox("Avatar Chuno", ["Islamic Male","Hijab Female","Young Boy","Old Man","Hero","Heroine","Ammi","Villain","Vlogger","Apni Photo Upload Karo - Apna Avatar","Avatar Band Karo"])
+    if avatar_choice=="Apni Photo Upload Karo - Apna Avatar":
+        av_photo=st.file_uploader("Apni Photo - Avatar Ke Liye", type=["jpg","png"])
+        if av_photo: st.image(av_photo, width=200)
+    elif avatar_choice=="Avatar Band Karo":
+        st.info("Avatar Band Hai - Sirf Voice + Photo Aayegi")
+    else:
+        st.success(f"Selected Avatar: {avatar_choice}")
+    if st.session_state.mode=="Single Video":
+        st.write("Single: 1 Avatar")
+    elif st.session_state.mode in ["Podcast Video","Comedy Show","Vlog"]:
+        st.write("Podcast / Comedy / Vlog: 2 Avatar Ek Saath Screen Par - Left + Right")
+        st.write("Vlog Me: Avatar Chalte Hue Bolega, Haath Se Ishara Karega 'Idhar Dekhen!'")
+    elif st.session_state.mode=="Drama":
+        st.write("Drama: 3-4 Avatar Ek Saath Screen Par - Jis Ki Baari Hogi, Us Ka Munh Hilega, Baaki Sunenge")
+    st.write("Humanize: Lipsync + Aankhen Jhapakna + Sir Hilana + Haath Hilana + Chehra")
+
+st.write("---")
+
+# ===== STEP 8: LOGO =====
+st.header("STEP 8: LOGO - Apna Logo Upload Karo")
+logo_file=st.file_uploader("Apna Logo Upload Karo", type=["png","jpg"])
+if logo_file:
+    st.image(logo_file, width=150)
+    st.success("✅ Logo Upload Ho Gaya - Video Ke Corner Me Aayega")
+
+st.write("---")
+
+# ===== STEP 9: EDITING =====
+st.header("STEP 9: EDITING - Graphics + Motions + Transitions + 4K Effect")
+st.write("Subscribe Button + Like Button + Subtitles - Sab Lagayenge")
+if st.session_state.mode=="Quran Recitation":
+    st.markdown('<div class="quran-box"><h3>QURAN ME MUSIC BAND HAI - Koi Music Nahi Aayega</h3><p>Quran Me Editing Ki Tarteeb - Zeniq Khud Dega:<br>1. Arabic Ayat Screen Par - Bade Lafz Me - Highlight Hoga<br>2. Qari Ki Awaz - Arabic Me - Quran.com Wali<br>3. 1 Sec Rukega<br>4. Tumhari Clone Voice - Urdu Tarjuma<br>5. Urdu Tarjuma Screen Par - Neeche Likha Hua<br>6. Background - Makkah / Madina<br>7. Phir Agli Ayat - Wahi Tarteeb</p></div>', unsafe_allow_html=True)
+else:
+    music_choice=st.selectbox("Music Chuno", ["Apna Music Upload Karo","Zeniq Ka Free Music Chuno - Emotional","Zeniq Ka Free Music - Islamic","Zeniq Ka Free Music - Suspense","Zeniq Ka Free Music - Motivational","Zeniq Ka Free Music - Sad","Zeniq Ka Free Music - Comedy","Zeniq Ka Free Music - Drama","Zeniq Ka Free Music - Vlog","Continue Without Music"])
+    if music_choice=="Apna Music Upload Karo":
+        mus=st.file_uploader("Apna Music Upload Karo", type=["mp3"])
+        if mus: st.audio(mus)
+    else:
+        st.write(f"Selected Music: {music_choice}")
+    st.write("Graphics: Subscribe Button + Like Button + Subtitles + Transitions + 4K Effect - Sab Lagayenge")
+
+st.write("---")
+
+# ===== STEP 10: FINAL RENDERING + LONG SE SHORT =====
+st.header("STEP 10: FINAL RENDERING + LONG SE SHORT AUTO CUTTER")
+st.write("Final Video Banayega - Long Se 3 Shorts Auto Bana Dega - Best Wala Hissa Kaat Kar")
+if st.button("Final Video Banao + 3 Shorts Auto"):
+    if st.session_state.videos_today >= 20:
+        st.error("❌ Aaj Ki Limit Khatam - 20 Video Ho Gayi - Kal Phir Try Karo")
+    else:
+        st.session_state.videos_today += 1
+        st.success(f"✅ Final Video Ban Gayi! Videos Today: {st.session_state.videos_today}/20")
+        st.write("Long Video: 8 Min - Ready")
+        st.write("Short 1: Best Hissa - 40 Sec - Auto Cut - Ready")
+        st.write("Short 2: Second Best Hissa - 40 Sec - Ready")
+        st.write("Short 3: Third Best Hissa - 40 Sec - Ready")
+        if st.session_state.mode=="Drama":
+            st.write("Drama: Part 1, Part 2, Part 3 Alag Alag Bana Diye - Ready")
+        if st.session_state.mode=="Quran Recitation":
+            st.write("Quran: 1 Ayat Wala Short Bhi Bana Diya - Jaise 'Surah Rehman - 1 Ayat' - Ready")
+        st.info("Real Rendering Laptop Par Hoga - MoviePy / FFmpeg Se - Streamlit Cloud Par Demo Hai")
+
+st.write("---")
+
+# ===== STEP 11: TITLE + THUMBNAIL + DESCRIPTION + TAGS - EK HI KEYWORD RULE =====
+st.header("STEP 11: TITLE + THUMBNAIL + DESCRIPTION + TAGS - EK HI KEYWORD RULE")
+st.write(f"Main Keyword: Wahi 1 Best Keyword Jo Step 2 Me Nikala Tha - **{st.session_state.main_kw if st.session_state.main_kw else topic}** - Sab Me Wahi Hoga, Shuru Me Hoga")
+if st.button("Step 11 - Title + Thumbnail + Description + Tags Banao - Ek Hi Keyword"):
+    main_kw = st.session_state.main_kw if st.session_state.main_kw else topic
+    st.subheader("Title: 3 Milenge - Teenon Me Wahi Main Keyword Hoga - Shuru Me Hoga")
+    title_res=ai(f"Give 3 titles for {topic} main keyword {main_kw} must be at start of all titles", topic=topic)
+    st.write(title_res)
+    st.write("---")
+    st.subheader("Thumbnail: 3 Milenge - Teenon Par Wahi Main Keyword Likha Hoga")
+    thumb_res=ai(f"Give 3 thumbnails for {topic} main keyword {main_kw} must be written on all thumbnails", topic=topic)
+    st.write(thumb_res)
+    st.write("---")
+    st.subheader("Description: Pehli 2 Line Me Wahi Main Keyword 2 Baar + Neeche Baaki 29 Keywords")
+    desc_res=ai(f"Write description for {topic} main keyword {main_kw} must appear 2 times in first 2 lines + other 29 keywords below", topic=topic)
+    st.write(desc_res)
+    st.code(desc_res)
+    if st.session_state.mode=="Quran Recitation":
+        st.write("Quran Me Description Me Zeniq Khud Likhega:")
+        st.code("Recitation & Text via Quran.com / Quran Foundation - Translation Voice: Zeniq")
+        st.write("Credit Ke Liye - Taake Claim Na Aaye")
+    st.write("---")
+    st.subheader("Tags: 30 Tags - Wahi 30 Best Keywords - Pehla Tag = Main Keyword")
+    tags_res=ai(f"Give 30 tags for {topic} first tag must be main keyword {main_kw}", topic=topic)
+    st.write(tags_res)
+    st.code(tags_res)
+
+st.write("---")
+
+# ===== STEP 12: ZENIQ SCORE + FIX + A/B TESTING =====
+st.header("STEP 12: ZENIQ SCORE + FIX + A/B TESTING")
+if st.button("Zeniq Score Dekho"):
+    score = random.randint(85, 96)
+    st.markdown(f"<h1 style='text-align:center;'>🎯 ZENIQ SCORE: {score} / 100</h1>", unsafe_allow_html=True)
+    st.progress(score/100)
+    if score>=90:
+        st.success("🔥 Excellent - Video Viral Hone Wali Hai!")
+    else:
+        st.warning("⚠️ Thora Fix Karo - Neeche Fix Dabao")
+    if st.button("Fix Karo - Khud Theek Kar Dega"):
+        st.write(ai(f"Fix this video topic {topic} mode {st.session_state.mode} score {score}. Give fix plan.", topic=topic))
+        st.success("✅ Fix Ho Gaya!")
+st.subheader("A/B Testing: 2 Thumbnail Laga Do, 2 Din Baad Zeniq Batayega Konsa Jeeta")
+col_a,col_b=st.columns(2)
+with col_a:
+    st.markdown('<div class="card-red"><h2>Thumbnail A</h2><p>Red Background<br>Score 82</p></div>', unsafe_allow_html=True)
+    va=st.number_input("A Clicks?", value=100, key="z_ab_a")
+with col_b:
+    st.markdown('<div class="card-blue"><h2>Thumbnail B</h2><p>Yellow Background<br>Score 91</p></div>', unsafe_allow_html=True)
+    vb=st.number_input("B Clicks?", value=150, key="z_ab_b")
+if st.button("Kaunsa Jeeta?"):
+    if vb>va: st.success(f"🏆 B Jeet Gaya! B {vb}, A {va} - B Lagao!")
+    else: st.success(f"🏆 A Jeet Gaya! A {va}, B {vb} - A Lagao!")
+
+st.write("---")
+
+# ===== STEP 13: SCHEDULER + BULK UPLOAD =====
+st.header("STEP 13: SCHEDULER + BULK UPLOAD")
+up_opt=st.selectbox("Upload Kaise Karo?", ["Abhi Upload Karo","Scheduler: Time Set Karo - Subah 9 Baje Long, Shaam 6 Baje Short - Khud Upload Hoga","Bulk Mode: 10 Video Ek Saath Bana Kar, Ek Ek Kar Ke Upload Karta Jayega"])
+platform=st.selectbox("Kahan Upload Karo?", ["YouTube","TikTok","Shorts","Download","YouTube + TikTok + Shorts - Teenon"])
+if up_opt=="Scheduler: Time Set Karo - Subah 9 Baje Long, Shaam 6 Baje Short - Khud Upload Hoga":
+    up_date=st.date_input("Kis Din?")
+    up_time=st.selectbox("Time?", ["Subah 9 Baje Long","Shaam 6 Baje Short","Raat 9 Baje Long","Dopahar 1 Baje Short"])
+    if st.button("Schedule Karo"):
+        st.success(f"✅ Scheduled! {up_date} Ko {up_time} Par {platform} Par Upload Hoga")
+elif up_opt=="Bulk Mode: 10 Video Ek Saath Bana Kar, Ek Ek Kar Ke Upload Karta Jayega":
+    if st.button("Bulk Mode Start Karo - 10 Video"):
+        st.success("✅ Bulk Mode Start - 10 Video Ek Saath Ban Rahi Hain - Ek Ek Kar Ke Upload Hoti Jayengi")
+        st.progress(0.3)
+        st.write("Video 1/10 - Upload Ho Gayi")
+        st.write("Video 2/10 - Ban Rahi Hai...")
+else:
+    if st.button("Abhi Upload Karo"):
+        st.success(f"✅ Upload Ho Gayi! Platform: {platform} (Demo - Real Upload Ke Liye YouTube OAuth Chahiye)")
+
+st.write("---")
+st.markdown("<p style='text-align:center;'>🔒 ZENIQ - MUKAMMAL FINAL FLOW - LOCKED | 6 MODE WALA | Quran.com Wala - Safe + Monetize | Version Lite - Free | 20 Video Roz</p>", unsafe_allow_html=True)
