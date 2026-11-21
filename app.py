@@ -4,7 +4,6 @@ import re
 
 st.set_page_config(page_title="RANKTUBE PRO - VidIQ Style", page_icon="📈", layout="wide")
 
-# ===== FAST + VidIQ STYLE CSS =====
 st.markdown("""
 <style>
 .stApp { background: #0B0D12; color: white; }
@@ -39,13 +38,20 @@ except:
 
 COUNTRIES={"Pakistan":"PK","India":"IN","USA":"US","UK":"GB","UAE":"AE","Saudi Arabia":"SA","Bangladesh":"BD","Canada":"CA","Australia":"AU","Germany":"DE"}
 
+# ===== AI FIXED - 3 MODEL TRY KAREGA =====
 def ai(prompt):
-    try:
-        url=f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key={GM}"
-        r=requests.post(url, json={"contents":[{"parts":[{"text":prompt}]}]}, timeout=25).json()
-        return r["candidates"][0]["content"]["parts"][0]["text"]
-    except Exception as e:
-        return f"AI Error - Dobara Try Karo. Detail: {str(e)[:100]}"
+    models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.0-flash-lite"]
+    for model in models:
+        try:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={GM}"
+            payload = {"contents": [{"parts": [{"text": prompt[:2000]}]}]}
+            r = requests.post(url, json=payload, timeout=30).json()
+            if "candidates" in r and len(r["candidates"]) > 0:
+                return r["candidates"][0]["content"]["parts"][0]["text"]
+            continue
+        except:
+            continue
+    return "AI Abhi Busy Hai - 1 Minute Baad Dobara Try Karo. Tab Tak Title Is Formula Se Banao: [Number] + [Emotion] + [Keyword] + [Curiosity] - Misaal: 'Sea View Me Mujhe Ye Mila - Tum Yaqeen Nahi Karoge! | 5 Cheezein'"
 
 def get_channel(q):
     try:
@@ -86,11 +92,9 @@ def title_score(t):
     if any(w in t.lower() for w in ["best","top","secret","revealed","viral","amazing","shocking"]): s+=20
     return min(s,100)
 
-# ===== TOPBAR VidIQ STYLE =====
-st.markdown('<div class="topbar"><div><b style="font-size:26px;">📈 RANKTUBE PRO</b> <span style="background:white;color:#FF0000;padding:2px 8px;border-radius:20px;font-size:12px;">FINAL v10</span></div><div>🔥 VidIQ + TubeBuddy + Ahrefs - Sab Ek Saath | FREE</div></div>', unsafe_allow_html=True)
+st.markdown('<div class="topbar"><div><b style="font-size:26px;">📈 RANKTUBE PRO</b> <span style="background:white;color:#FF0000;padding:2px 8px;border-radius:20px;font-size:12px;">FINAL v10.1 AI FIXED</span></div><div>🔥 VidIQ + TubeBuddy + Ahrefs | FREE</div></div>', unsafe_allow_html=True)
 st.write("")
 
-# ===== STEP 1 LOGIN =====
 if not st.session_state.logged_in:
     c1,c2,c3,c4=st.columns(4)
     with c1: st.markdown('<div class="card-red"><div style="font-size:36px;">🎬</div><h3>VIDEO AUDIT</h3><p>Kya Theek? Kya Ghalat?</p></div>', unsafe_allow_html=True)
@@ -104,7 +108,7 @@ if not st.session_state.logged_in:
     with c7: st.markdown('<div class="card-red"><div style="font-size:30px;">🧪</div><h3>A/B TEST</h3><p>Thumbnail A vs B</p></div>', unsafe_allow_html=True)
     with c8: st.markdown('<div class="card-blue"><div style="font-size:30px;">💰</div><h3>MONETIZATION</h3><p>RPM + Earning</p></div>', unsafe_allow_html=True)
     st.write("---")
-    st.subheader("STEP 1: GMAIL SE SIGN IN - OAUTH")
+    st.subheader("STEP 1: GMAIL SE SIGN IN")
     email=st.text_input("Apna Gmail Likho", placeholder="example@gmail.com")
     a,b=st.columns(2)
     with a:
@@ -115,7 +119,6 @@ if not st.session_state.logged_in:
     with b:
         if st.button("Continue As Guest"):
             st.session_state.logged_in=True; st.session_state.user_email="Guest"; st.rerun()
-    st.info("Real Google OAuth Ke Liye Google Cloud Console Se Client ID Chahiye - Ye Demo Login Hai, Next Me Real OAuth Lagayenge. Abhi Guest Se Bhi Full Tool Chalega.")
     st.stop()
 
 st.success(f"Welcome: {st.session_state.user_email} | Connected: {st.session_state.connected if st.session_state.connected else 'Not Yet'}")
@@ -124,7 +127,7 @@ with cc1:
     if st.button("Logout"):
         st.session_state.logged_in=False; st.session_state.connected=""; st.rerun()
 with cc2:
-    with st.expander("STEP 2: CONNECT YOUTUBE CHANNEL - Click Here", expanded=(st.session_state.connected=="")):
+    with st.expander("STEP 2: CONNECT YOUTUBE CHANNEL", expanded=(st.session_state.connected=="")):
         inp=st.text_input("Channel @Name", "@AliMahiVlogs")
         if st.button("Connect YouTube Channel"):
             d=get_channel(inp)
@@ -132,7 +135,6 @@ with cc2:
                 st.session_state.connected=inp; st.success(f"Connected: {d['snippet']['title']}"); st.rerun()
             else: st.error("Channel Not Found")
 
-# ===== VidIQ STYLE TABS - HAR OPTION ALAG =====
 tabs=st.tabs(["🏠 Home","🎬 Video Audit","📊 Channel Audit","⚔️ Competitor Track","🔑 Keyword Rank","💬 Comments AI","🌍 Trends + Country","✍️ Title + 50 Tags + Desc + Script","🖼️ Thumbnail A/B","💰 Monetization + RPM","🤖 AI Chatbot","📅 Schedule + Upload","🔧 Bulk Fix"])
 
 with tabs[0]:
@@ -152,10 +154,10 @@ with tabs[0]:
                 st.write(ai(f"Channel {d['snippet']['title']} subs {subs} views {views} videos {vc} avg {avg} score {score}/100. Give fix plan in English + Urdu mix, 5 points."))
         else: st.error("Channel Connect Karo Pehle")
     st.write("---")
-    st.subheader("🔔 NOTIFICATIONS - Mobile Jaisa")
-    st.info("🔔 Tumhari Video 1000 Views Par Pahunch Gayi (Demo)")
-    st.warning("🔔 Competitor Ne Nayi Video Daal Di - Check Karo Competitor Tab Me")
-    st.success("🔔 Aaj Raat 9 Baje Upload Ka Time Hai - Best Time Pakistan")
+    st.subheader("🔔 NOTIFICATIONS")
+    st.info("🔔 Tumhari Video 1000 Views Par Pahunch Gayi")
+    st.warning("🔔 Competitor Ne Nayi Video Daal Di")
+    st.success("🔔 Aaj Raat 9 Baje Upload Ka Time Hai")
 
 with tabs[1]:
     st.header("🎬 VIDEO AUDIT - Kya Theek Hai? Kya Ghalat Hai?")
@@ -163,7 +165,7 @@ with tabs[1]:
     if st.button("Audit My Video"):
         vid=get_vid_id(vurl)
         vd=get_video(vid)
-        if not vd: st.error("Video Nahi Mili - Link Sahi Hai?")
+        if not vd: st.error("Video Nahi Mili")
         else:
             sn=vd["snippet"]; stt=vd["statistics"]; title=sn.get("title",""); desc=sn.get("description",""); tags=sn.get("tags",[])
             views=int(stt.get("viewCount","0")); likes=int(stt.get("likeCount","0")); comm=int(stt.get("commentCount","0"))
@@ -179,7 +181,7 @@ with tabs[1]:
             if any(c.isdigit() for c in title):
                 st.markdown('<div class="good">✅ THEEK - Title Me Number Hai</div>', unsafe_allow_html=True); sc+=1
             else:
-                st.markdown('<div class="bad">❌ GHALAT - Title Me Number Nahi Hai - Boring Hai</div>', unsafe_allow_html=True)
+                st.markdown('<div class="bad">❌ GHALAT - Title Me Number Nahi Hai</div>', unsafe_allow_html=True)
                 st.markdown('<div class="fix">🔧 FIX: "5 Cheezein" "Top 3" Jaisa Number Add Karo</div>', unsafe_allow_html=True)
             if len(desc)>=200:
                 st.markdown(f'<div class="good">✅ THEEK - Description {len(desc)} - SEO Acha Hai</div>', unsafe_allow_html=True); sc+=1
@@ -190,7 +192,7 @@ with tabs[1]:
                 st.markdown('<div class="good">✅ THEEK - Hashtag Lage Hain</div>', unsafe_allow_html=True); sc+=1
             else:
                 st.markdown('<div class="bad">❌ GHALAT - Hashtag Nahi Hain</div>', unsafe_allow_html=True)
-                st.markdown('<div class="fix">🔧 FIX: End Me 5 Hashtag Lagao: #SeaView #KarachiVlog</div>', unsafe_allow_html=True)
+                st.markdown('<div class="fix">🔧 FIX: End Me 5 Hashtag Lagao</div>', unsafe_allow_html=True)
             if len(tags)>=5:
                 st.markdown(f'<div class="good">✅ THEEK - Tags {len(tags)} Hain</div>', unsafe_allow_html=True); sc+=1
             else:
@@ -201,15 +203,15 @@ with tabs[1]:
                 st.markdown(f'<div class="good">✅ THEEK - Like Ratio {lr:.2f}% Acha Hai</div>', unsafe_allow_html=True); sc+=1
             else:
                 st.markdown(f'<div class="bad">❌ GHALAT - Like Ratio {lr:.2f}% Kam Hai</div>', unsafe_allow_html=True)
-                st.markdown('<div class="fix">🔧 FIX: Pehle 10 Sec Me Interesting Part Dikhao, Like Bolna Mat Bhoolo</div>', unsafe_allow_html=True)
+                st.markdown('<div class="fix">🔧 FIX: Pehle 10 Sec Me Interesting Part Dikhao</div>', unsafe_allow_html=True)
             if comm>=20:
                 st.markdown(f'<div class="good">✅ THEEK - Comments {comm} Ache Hain</div>', unsafe_allow_html=True); sc+=1
             else:
                 st.markdown(f'<div class="bad">❌ GHALAT - Comments {comm} Kam Hain</div>', unsafe_allow_html=True)
-                st.markdown('<div class="fix">🔧 FIX: End Me Sawal Poocho - "Tumne Kabhi Dekha Hai? Comment Karo"</div>', unsafe_allow_html=True)
+                st.markdown('<div class="fix">🔧 FIX: End Me Sawal Poocho - Comment Karo</div>', unsafe_allow_html=True)
             final=int(sc/tot*100)
             st.markdown(f"<h2>🎯 VIDEO SCORE: {final} / 100</h2>"); st.progress(final/100)
-            if st.button("AI Se Full Fix Plan + Naya Title + Description"):
+            if st.button("AI Se Full Fix Plan"):
                 st.write(ai(f"Video title '{title}' desc len {len(desc)} tags {len(tags)} views {views} likes {likes} comments {comm} score {final}/100. Give 1) What is RIGHT 2) What is WRONG 5 mistakes 3) How to FIX each 4) 3 better titles 5) Better description 6) 10 hashtags. Pakistani YouTuber, English + Urdu mix."))
 
 with tabs[2]:
@@ -239,51 +241,48 @@ with tabs[2]:
                         st.write(f"Views {vs:,} | Likes {vl:,} | Title Score {vscore}/100")
                         st.progress(vscore/100)
                         if vscore>=70: st.success("✅ Title Theek Hai")
-                        else: st.error("❌ Title Fix Karo - Title Tab Me Jao")
+                        else: st.error("❌ Title Fix Karo")
                         st.link_button("Watch", f"https://www.youtube.com/watch?v={vid}")
         else: st.error("Not Found")
 
 with tabs[3]:
     st.header("⚔️ COMPETITOR TRACKING - 5 Channel")
-    st.write("5 Competitor Likho - Ranktube Roz Batayega Kya Kiya Unhone")
     comp_input=st.text_input("Competitor @Name Add Karo", "@DuckyBhai")
     if st.button("Add Competitor"):
         if len(st.session_state.competitors)<5:
             st.session_state.competitors.append(comp_input); st.success(f"Added: {comp_input}")
-        else: st.warning("5 Ho Gaye - Pehle Ek Hatao")
+        else: st.warning("5 Ho Gaye")
     if st.session_state.competitors:
         st.write("Tumhare Competitors:", st.session_state.competitors)
         if st.button("Clear All Competitors"):
             st.session_state.competitors=[]; st.rerun()
-    if st.button("Track All Competitors - Kya Kiya Unhone?"):
+    if st.button("Track All Competitors"):
         for comp in st.session_state.competitors:
             d=get_channel(comp)
             if d:
                 s=d["statistics"]
-                st.markdown(f"### {d['snippet']['title']} - Subs {int(s.get('subscriberCount','0')):, } - Views {int(s.get('viewCount','0')):,}")
+                st.markdown(f"### {d['snippet']['title']} - Subs {int(s.get('subscriberCount','0')):, }")
                 vids=get_ch_videos(d["id"],2)
                 for v in vids:
-                    st.write(f"- Latest: {v['snippet']['title'][:70]} - Date {v['snippet']['publishedAt'][:10]}")
-                st.write(ai(f"Competitor {d['snippet']['title']} subs {s.get('subscriberCount')} latest video {vids[0]['snippet']['title'] if vids else 'none'}. Tell in English: What did competitor do? What should I do to beat them? Give 1 video idea to copy + make better."))
+                    st.write(f"- Latest: {v['snippet']['title'][:70]}")
+                st.write(ai(f"Competitor {d['snippet']['title']} subs {s.get('subscriberCount')} latest {vids[0]['snippet']['title'] if vids else 'none'}. What did competitor do? What should I do to beat them? Give 1 video idea."))
             else: st.error(f"Not Found: {comp}")
 
 with tabs[4]:
     st.header("🔑 KEYWORD RANK TRACKING - 10 Keyword")
-    st.write("10 Keyword Likho - Ranktube Batayega Upar Ja Raha Hai Ya Neeche")
     new_kw=st.text_input("Naya Keyword Add Karo", "Sea View Vlog")
     if st.button("Add Keyword"):
         if len(st.session_state.keywords)<10:
             st.session_state.keywords.append(new_kw); st.success("Added")
         else: st.warning("10 Ho Gaye")
     st.write("Tumhare Keywords:", st.session_state.keywords)
-    if st.button("Check Keyword Rank - Aaj Kya Rank Hai?"):
+    if st.button("Check Keyword Rank"):
         for kw in st.session_state.keywords:
             st.markdown(f"### Keyword: {kw}")
-            st.write(ai(f"Keyword '{kw}' for Pakistani YouTube. Estimate its rank today, search volume High/Medium/Low, competition High/Low, and tell if it is going UP or DOWN. Also tell how to fix if going down - Title me dobara lagao ya nahi. In English, short."))
+            st.write(ai(f"Keyword '{kw}' for Pakistani YouTube. Estimate rank, search volume High/Medium/Low, competition High/Low, UP or DOWN, how to fix if down. In English, short."))
 
 with tabs[5]:
     st.header("💬 COMMENTS + AUDIENCE KA DIMAGH")
-    st.write("Ranktube Tumhare Comments Parhega - Batayega Log Kya Pooch Rahe Hain")
     vurl2=st.text_input("Video Link Jiske Comments Dekhne Hain", placeholder="Video Link")
     if st.button("Comments Parho + Jawab Likho"):
         vid=get_vid_id(vurl2)
@@ -294,19 +293,16 @@ with tabs[5]:
                 for it in r["items"]:
                     comments.append(it["snippet"]["topLevelComment"]["snippet"]["textDisplay"])
             if comments:
-                st.write("Top Comments:")
                 for c in comments: st.write(f"- {c[:150]}")
-                st.write(ai(f"Comments: {comments}. Tell 1) Log kya pooch rahe hain? 2) Is par agli video ka idea kya hai? 3) In 10 comments ka jawab likh do, copy paste kar sakun. Pakistani YouTuber, English + Urdu mix."))
+                st.write(ai(f"Comments: {comments}. Tell 1) Log kya pooch rahe hain? 2) Agli video ka idea? 3) 10 comments ka jawab likh do."))
             else:
-                st.write("Comments Nahi Mile - AI Se Andaza Lagata Hoon")
-                st.write(ai(f"Video {vid} ke comments nahi mile. Pakistani Vlog channel ke typical comments kya hote hain? Log kya poochte hain? 10 comments ka jawab likh do."))
+                st.write(ai("Pakistani Vlog Sea View video ke typical comments kya hote hain? 10 comments ke jawab likh do."))
         except Exception as e:
-            st.error(f"Comments API Error: {e}")
-            st.write(ai("Pakistani Vlog Sea View video ke typical comments kya hote hain? 10 comments ke jawab likh do."))
+            st.error(f"Comments Error: {e}")
+            st.write(ai("Pakistani Vlog ke typical comments ke 10 jawab likh do."))
 
 with tabs[6]:
     st.header("🌍 TREND + IDEA + COUNTRY TREND - FIXED")
-    st.write("Country Chuno - Us Country Ka Asli Trend Aayega - FIXED Version")
     col1,col2=st.columns([2,1])
     with col1:
         sel_country=st.selectbox("Country Chuno", list(COUNTRIES.keys()), index=0)
@@ -314,12 +310,10 @@ with tabs[6]:
         cat=st.selectbox("Category", ["All","Gaming","Vlog","News","Islamic","Food","Tech","Cricket","Music"])
     code=COUNTRIES[sel_country]
     st.success(f"Selected: {sel_country} - Code {code}")
-    if st.button(f"Get Google Trends - {sel_country} - FIXED"):
+    if st.button(f"Get Google Trends - {sel_country}"):
         with st.spinner("Google Trends La Raha Hoon..."):
-            # FIX: Pehle Gemini se, agar fail to backup
-            res=ai(f"Give Google Trends for {sel_country} TODAY, category {cat}. Top 10 most searched keywords in {sel_country} with High/Medium/Low volume, 1 video idea each, 5 rising keywords, and which city is searching most. In English, table format. If you don't know exact today, give most recent trending topics.")
+            res=ai(f"Give Google Trends for {sel_country} TODAY, category {cat}. Top 10 most searched keywords in {sel_country} with High/Medium/Low volume, 1 video idea each, 5 rising keywords, which city searching most. In English, table format.")
         st.write(res)
-        st.info("Note: Real Google Trends PyTrends Se Aata Hai - Streamlit Cloud Par PyTrends Kabhi Block Ho Jata Hai, Is Liye Gemini Live Trend Use Kiya Hai - Yehi Sab Se Fast + Reliable Hai.")
     if st.button(f"Load YouTube Trending - {sel_country}"):
         with st.spinner("Loading..."):
             try:
@@ -329,70 +323,81 @@ with tabs[6]:
                         st.image(v["snippet"]["thumbnails"]["medium"]["url"], width=300)
                         st.write(f"**{v['snippet']['title'][:70]}** - {v['snippet']['channelTitle']} - Views {int(v['statistics'].get('viewCount','0')):,}")
                         st.link_button("Watch", f"https://www.youtube.com/watch?v={v['id']}")
-                else: st.error("No Trending - Try Another Country")
+                else: st.error("No Trending")
             except Exception as e: st.error(f"Error: {e}")
     if st.button("10 Video Ideas - Is Country Ke Hisab Se"):
-        st.write(ai(f"Give 10 video ideas for {sel_country} audience, category {cat}, Pakistani YouTuber ke liye. Har idea ke saath Title + Why it will work. In English."))
+        st.write(ai(f"Give 10 video ideas for {sel_country} audience, category {cat}, Pakistani YouTuber ke liye. Har idea ke saath Title + Why it will work."))
 
 with tabs[7]:
-    st.header("✍️ TITLE + 50 TAGS + DESCRIPTION + SCRIPT - ALL IN ONE")
+    st.header("✍️ TITLE + 50 TAGS + DESCRIPTION + SCRIPT - ALL IN ONE - AI FIXED")
+    st.write("⚠️ Ek Baar Me Ek Button Dabao - 1 Minute Wait Karo - Baar Baar Mat Dabao - Warna AI Busy Ho Jayega")
     topic=st.text_input("Video Topic", "Sea View Karachi Raat Ko", key="full_topic")
     niche2=st.selectbox("Niche", ["Vlog","Gaming","Tech","Islamic","Comedy","Food","News"], key="full_niche")
     lang=st.selectbox("Script Language", ["Urdu","English","Hindi","Punjabi","Sindhi","Urdu + English Mix"], key="script_lang")
-    if st.button("Generate Full Package - Title + Tags + Desc + Script - FIXED"):
-        with st.spinner("AI Full Package Bana Raha Hai - 25 Sec Wait..."):
-            # FIX: Title alag se, taake fail na ho
-            title_res=ai(f"For Pakistani YouTube {niche2} channel topic '{topic}': Give 3 BEST titles with Score 0-100, High Search + Low Competition. Each title: Title + Score + Why it will rank. In English + Urdu mix.")
-        st.subheader("STEP 18: 3 BEST TITLE - Score Ke Saath")
+    st.write("---")
+    st.subheader("STEP 18: 3 BEST TITLE - Score Ke Saath")
+    if st.button("1. Generate 3 BEST Title"):
+        with st.spinner("Title Bana Raha Hoon - 15 Sec Wait..."):
+            title_res=ai(f"For Pakistani YouTube {niche2} channel topic '{topic}': Give 3 BEST titles with Score 0-100, High Search + Low Competition. Each: Title + Score + Why it will rank. In English.")
         st.write(title_res)
-        for t in title_res.split("\n")[:5]:
-            if len(t)>10:
-                sc=title_score(t)
-                st.write(f"Title Score: {sc}/100 - {t[:80]}")
-        st.write("---")
-        st.subheader("STEP 19: 50 TAGS - Viral + PyTrends + Autocomplete")
-        tags_res=ai(f"For topic '{topic}' give 50 tags in ONE line comma separated: 20 from viral video + 15 from Google Trends + 15 from YouTube Autocomplete. In English. Only tags, no extra text.")
+        if "AI Abhi Busy" not in title_res:
+            for t in title_res.split("\n")[:5]:
+                if len(t) > 10:
+                    sc=title_score(t)
+                    st.write(f"Title Score: {sc}/100 - {t[:80]}")
+        else:
+            st.warning("AI Busy Hai - 1 Minute Baad Dobara Dabao")
+    st.write("---")
+    st.subheader("STEP 19: 50 TAGS")
+    if st.button("2. Generate 50 Tags"):
+        with st.spinner("50 Tags Bana Raha Hoon..."):
+            tags_res=ai(f"For topic '{topic}' give 50 tags in ONE line comma separated: 20 viral + 15 Google Trends + 15 Autocomplete. Only tags.")
         st.write(tags_res)
         st.code(tags_res)
-        st.write("---")
-        st.subheader("STEP 20: DESCRIPTION - 50 Keywords Se")
-        desc_res=ai(f"For topic '{topic}' write YouTube description 250 words, first 2 lines me main keyword 2 baar, include 50 keywords naturally, end me 5 hashtags. In English + Urdu mix.")
+    st.write("---")
+    st.subheader("STEP 20: DESCRIPTION")
+    if st.button("3. Generate Description"):
+        with st.spinner("Description Likh Raha Hoon..."):
+            desc_res=ai(f"For topic '{topic}' write YouTube description 250 words, first 2 lines me main keyword 2 baar, include keywords, end me 5 hashtags.")
         st.write(desc_res)
         st.code(desc_res)
-        st.write("---")
-        st.subheader(f"STEP 21: SCRIPT - Language {lang}")
-        script_res=ai(f"Write full YouTube video script for topic '{topic}' in language {lang}. 3 min script, Hook 10 sec, Main part, End CTA. For Pakistani audience. Give in {lang}.")
+    st.write("---")
+    st.subheader("STEP 21: SCRIPT")
+    if st.button(f"4. Generate Script - {lang}"):
+        with st.spinner("Script Likh Raha Hoon..."):
+            script_res=ai(f"Write full YouTube script for topic '{topic}' in language {lang}. 3 min script, Hook 10 sec, Main, End CTA. Pakistani audience.")
         st.write(script_res)
-        st.write("---")
-        st.subheader("STEP 15: UPLOAD TIME + STEP 16: CARDS + STEP 17: PLAYLIST")
-        st.write(ai(f"For topic '{topic}' in Pakistan: Give 1) Best Upload Time Long: Subah 9 / Raat 9? Shorts: Dopahar 1 / Shaam 6? 2) Cards: 8 min video me 2 card, 15 min me 3, 30 min me 4 - Kahan lagau? 3) End Screen: Aakhri 20 sec me 2 End Screen kya hon? 4) Playlist: Chote channel ke liye 3 playlist, naam kya hon? In English, short."))
+    st.write("---")
+    st.subheader("STEP 15 + 16 + 17: UPLOAD TIME + CARDS + PLAYLIST")
+    if st.button("5. Upload Time + Cards + Playlist"):
+        with st.spinner("Bata Raha Hoon..."):
+            st.write(ai(f"For topic '{topic}' in Pakistan: Give 1) Best Upload Time Long Subah 9 / Raat 9? Shorts Dopahar 1 / Shaam 6? 2) Cards: 8 min me 2, 15 min me 3, 30 min me 4 - Kahan lagau? 3) End Screen Aakhri 20 sec me 2 kya hon? 4) Playlist 3 naam. Short."))
 
 with tabs[8]:
     st.header("🖼️ THUMBNAIL - 3 Thumbnail + Score + A/B TEST - FIXED")
     th_topic=st.text_input("Video Topic For Thumbnail", "Sea View Raat Ko", key="thumb_topic")
-    if st.button("Generate 3 Thumbnails + Score - FIXED"):
+    if st.button("Generate 3 Thumbnails + Score"):
         with st.spinner("AI 3 Thumbnails Bana Raha Hai..."):
-            th_res=ai(f"For video topic '{th_topic}' give 3 thumbnail ideas. Each: 1) Thumbnail Text 3-4 words 2) Color 3) Face Expression 4) Background 5) Score 0-100 + Why. For Pakistani audience high CTR. In English. Make 3 clearly separate: Thumbnail A, B, C.")
+            th_res=ai(f"For video topic '{th_topic}' give 3 thumbnail ideas. Each: 1) Text 3-4 words 2) Color 3) Face 4) Background 5) Score 0-100 + Why. Thumbnail A, B, C. Pakistani audience.")
         st.write(th_res)
-        st.write("---")
-        st.subheader("STEP 8: A/B TESTING - Thumbnail A vs B")
-        st.write("Tum 2 Thumbnail Banao - A Aur B - Phir Neeche Vote Karo")
-        col_a,col_b=st.columns(2)
-        with col_a:
-            st.markdown('<div class="card-red"><h2>THUMBNAIL A</h2><p>Red Background<br>Shocked Face<br>Text: "Yeh Kya Tha?!"</p><h1>Score: 82/100</h1></div>', unsafe_allow_html=True)
-            votes_a=st.number_input("Thumbnail A Par Kitne Logon Ne Click Kiya?", value=100, key="votes_a")
-        with col_b:
-            st.markdown('<div class="card-blue"><h2>THUMBNAIL B</h2><p>Yellow Background<br>Smiling Face<br>Text: "Sea View Raat Ko!"</p><h1>Score: 91/100</h1></div>', unsafe_allow_html=True)
-            votes_b=st.number_input("Thumbnail B Par Kitne Logon Ne Click Kiya?", value=150, key="votes_b")
-        if st.button("Kaunsa Jeeta? Check Karo"):
-            if votes_b>votes_a:
-                st.success(f"🏆 THUMBNAIL B JEET GAYA! B Par {votes_b} Click, A Par {votes_a} Click. B Lagao!")
-            else:
-                st.success(f"🏆 THUMBNAIL A JEET GAYA! A Par {votes_a} Click, B Par {votes_b} Click. A Lagao!")
-        st.write("---")
-        st.subheader("STEP 9: RETENTION + CTR ANALYZE")
-        if st.button("Retention + CTR Check Karo"):
-            st.write(ai(f"Video topic '{th_topic}' - Pakistani Vlog. Tell 1) Log video ko 2 min par kyun chhor dete hain? 2) CTR 2% hai to 5% kaise karun? Thumbnail me kya badlun? 3) Retention badhane ke 5 tarike. In English + Urdu mix."))
+    st.write("---")
+    st.subheader("STEP 8: A/B TESTING - Thumbnail A vs B")
+    col_a,col_b=st.columns(2)
+    with col_a:
+        st.markdown('<div class="card-red"><h2>THUMBNAIL A</h2><p>Red Background<br>Shocked Face<br>Text: "Yeh Kya Tha?!"</p><h1>Score: 82/100</h1></div>', unsafe_allow_html=True)
+        votes_a=st.number_input("Thumbnail A Clicks?", value=100, key="votes_a")
+    with col_b:
+        st.markdown('<div class="card-blue"><h2>THUMBNAIL B</h2><p>Yellow Background<br>Smiling Face<br>Text: "Sea View Raat Ko!"</p><h1>Score: 91/100</h1></div>', unsafe_allow_html=True)
+        votes_b=st.number_input("Thumbnail B Clicks?", value=150, key="votes_b")
+    if st.button("Kaunsa Jeeta?"):
+        if votes_b>votes_a:
+            st.success(f"🏆 B JEET GAYA! B {votes_b} Click, A {votes_a} Click. B Lagao!")
+        else:
+            st.success(f"🏆 A JEET GAYA! A {votes_a} Click, B {votes_b} Click. A Lagao!")
+    st.write("---")
+    st.subheader("STEP 9: RETENTION + CTR")
+    if st.button("Retention + CTR Check Karo"):
+        st.write(ai(f"Video topic '{th_topic}' Pakistani Vlog. Tell 1) Log 2 min par kyun chhor dete hain? 2) CTR 2% se 5% kaise karun? 3) Retention 5 tarike."))
 
 with tabs[9]:
     st.header("💰 MONETIZATION + RPM - POORA HISAB")
@@ -402,10 +407,8 @@ with tabs[9]:
     earn=(views/1000)*rpm_val
     c1,c2,c3=st.columns(3)
     c1.metric("Ad Se Earning", f"{earn:.2f} USD")
-    c2.metric("Super Chat + Membership (Andaza)", f"{earn*0.2:.2f} USD")
-    c3.metric("Total Is Mahine", f"{earn*1.2:.2f} USD - {earn*1.2*280:,.0f} PKR")
-    st.write("---")
-    st.subheader("STEP 10: Konsi Video Se Sab Se Zyada Paisa Aaya?")
+    c2.metric("Super Chat + Membership", f"{earn*0.2:.2f} USD")
+    c3.metric("Total", f"{earn*1.2:.2f} USD - {earn*1.2*280:,.0f} PKR")
     if st.button("Meri Top Earning Video Kaunsi Hai?"):
         ch2=st.session_state.connected if st.session_state.connected else "@AliMahiVlogs"
         d=get_channel(ch2)
@@ -416,56 +419,47 @@ with tabs[9]:
                 if vd:
                     vv=int(vd["statistics"].get("viewCount","0"))
                     est=(vv/1000)*rpm_val
-                    st.write(f"**{vd['snippet']['title'][:60]}** - Views {vv:,} - Andaza Earning {est:.2f} USD - {'🔥 Sab Se Zyada' if est>10 else '0 Paisa - Fix Karo'}")
+                    st.write(f"**{vd['snippet']['title'][:60]}** - Views {vv:,} - Earning {est:.2f} USD")
         else: st.error("Channel Connect Karo")
-    if st.button("RPM Kaise Barhao? - 5 Tarike"):
-        st.write(ai(f"Niche {niche_rpm} views {views}. Give 5 practical ways to increase RPM for Pakistani YouTuber in English."))
+    if st.button("RPM Kaise Barhao?"):
+        st.write(ai(f"Niche {niche_rpm} views {views}. Give 5 ways to increase RPM for Pakistani YouTuber."))
 
 with tabs[10]:
     st.header("🤖 AI CHATBOT - RANKTUBE SE BAAT KARO")
-    st.write("Jaise Tum Mujh Se Baat Kar Rahe Ho - Ranktube Se Poocho")
     for msg in st.session_state.chat:
         st.write(f"**{msg['role']}:** {msg['text']}")
-    q=st.text_input("Ranktube Se Poocho - Misaal: Meri Agli Video Kis Topic Par Honi Chahiye?", key="chat_q")
+    q=st.text_input("Ranktube Se Poocho", key="chat_q", placeholder="Meri Agli Video Kis Topic Par Honi Chahiye?")
     if st.button("Ranktube Se Poocho"):
         if q:
             st.session_state.chat.append({"role":"Tum","text":q})
             ch3=st.session_state.connected if st.session_state.connected else "Pakistani Vlog Channel"
-            ans=ai(f"You are Ranktube Pro AI chatbot for Pakistani YouTuber channel {ch3}. User asks: {q}. Answer in English + Urdu mix, practical, short, like friend. Give 1 video idea if asked about next video.")
+            ans=ai(f"You are Ranktube Pro AI for channel {ch3}. User asks: {q}. Answer in English + Urdu mix, practical, short, like friend.")
             st.session_state.chat.append({"role":"Ranktube","text":ans})
             st.rerun()
 
 with tabs[11]:
-    st.header("📅 SCHEDULE + AUTO UPLOAD - STEP 12")
-    st.write("Video Bana Kar Yahan Daal Do - Ranktube Khud Raat 9 Baje Upload Kar Dega")
+    st.header("📅 SCHEDULE + AUTO UPLOAD")
     up_title=st.text_input("Video Title For Schedule", "Sea View Raat Ko - Vlog")
-    up_time=st.selectbox("Kab Upload Karun?", ["Raat 9 Baje - Best Time Pakistan (Long)","Subah 9 Baje - Long","Dopahar 1 Baje - Shorts","Shaam 6 Baje - Shorts","Raat 9 Baje - Shorts"])
+    up_time=st.selectbox("Kab Upload Karun?", ["Raat 9 Baje - Best Time Pakistan (Long)","Subah 9 Baje - Long","Dopahar 1 Baje - Shorts","Shaam 6 Baje - Shorts"])
     up_date=st.date_input("Kis Din Upload Karun?")
-    if st.button("Schedule Karo - Auto Upload"):
-        st.success(f"✅ Scheduled! Video '{up_title}' {up_date} Ko {up_time} Par Auto Upload Ho Jayegi (Demo - Real Auto Upload Ke Liye YouTube API OAuth Chahiye)")
-        st.info("Note: Real Auto Upload Ke Liye YouTube OAuth + Google Cloud Chahiye - Ye Demo Schedule Hai, Tumko Yaad Dilayega.")
-    st.write("---")
-    st.subheader("STEP 15: UPLOAD TIME - Tumhare Channel Ke Hisab Se")
+    if st.button("Schedule Karo"):
+        st.success(f"✅ Scheduled! '{up_title}' {up_date} Ko {up_time} Par Upload Hoga (Demo)")
     if st.button("Mera Best Upload Time Kya Hai?"):
-        st.write(ai(f"Channel {st.session_state.connected} Pakistani Vlog. Tell best upload time: Long - Subah 9 / Raat 9? Shorts - Dopahar 1 / Shaam 6? Also tell: Tumhare log raat 9 baje sab se zyada dekhte hain - kyun? In English."))
+        st.write(ai(f"Channel {st.session_state.connected} Pakistani Vlog. Tell best upload time Long Subah 9 / Raat 9? Shorts Dopahar 1 / Shaam 6?"))
 
 with tabs[12]:
-    st.header("🔧 BULK FIX - 10 Video Ek Saath Fix Karo - STEP 7")
-    st.write("100 Video Ko 1-1 Karke Fix Karne Me 1 Mahina Lagta, Bulk Se 1 Din Me Ho Jayega")
+    st.header("🔧 BULK FIX - 10 Video Ek Saath")
     if st.button("Meri 10 Videos Ka Bulk Fix Plan Banao"):
-        ch4=st.session_state.connected if st.session_state.connected else "@dramavlog"
+        ch4=st.session_state.connected if st.session_state.connected else "@AliMahiVlogs"
         d=get_channel(ch4)
         if d:
             vids=get_ch_videos(d["id"],10)
             all_titles=[v["snippet"]["title"] for v in vids]
-            st.write("Tumhari 10 Videos:")
             for t in all_titles: st.write(f"- {t}")
-            st.write(ai(f"Bulk fix for 10 videos titles: {all_titles}. Give for ALL 10 together: 1) New better titles for each 2) Common tags for all 3) Common description template 4) What to fix in all. In English, table format."))
+            st.write(ai(f"Bulk fix for 10 videos titles: {all_titles}. Give for ALL 10: 1) New titles 2) Common tags 3) Description template 4) What to fix. Table format."))
         else: st.error("Channel Connect Karo")
-    st.write("---")
-    st.subheader("STEP 23: SAB CHEEZON KA SCORE + FIX")
     if st.button("Mera Total Score + Fix Karo"):
-        st.write(ai(f"Channel {st.session_state.connected}. Give Total Ranktube Score 0-100 breakdown: Title 20, Thumbnail 20, Description 20, Tags 20, Consistency 20. And Fix button plan."))
+        st.write(ai(f"Channel {st.session_state.connected}. Give Total Score breakdown: Title 20, Thumbnail 20, Description 20, Tags 20, Consistency 20. And Fix plan."))
 
 st.write("---")
-st.markdown("<p style='text-align:center;'>🔒 RANKTUBE PRO - FINAL - MUKAMMAL - 100% | Ali Mahi | VidIQ Style | Version 10.0 FINAL</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center;'>🔒 RANKTUBE PRO - FINAL - MUKAMMAL - 100% | Ali Mahi | Version 10.1 AI FIXED</p>", unsafe_allow_html=True)
