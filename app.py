@@ -1,65 +1,76 @@
 import streamlit as st
+import requests
 
 st.set_page_config(page_title="RANKTUBE PRO", page_icon="📈", layout="wide")
+st.title("📈 RANKTUBE PRO - ASLI DATA WALA")
+st.write("Ab Ye Naqli Nahi, Asli YouTube Data Dikhaega")
 
-st.title("📈 RANKTUBE PRO")
-st.write("VidIQ + TubeBuddy + Ahrefs Se Aage - Tumhara Apna YouTube SEO Tool")
+# Keys Secrets se lena
+try:
+    YOUTUBE_KEY = st.secrets["YOUTUBE_API_KEY"]
+    GEMINI_KEY = st.secrets["GEMINI_API_KEY"]
+    st.success("✅ Dono Keys Lag Gayi - Ab Asli Data Aayega")
+except:
+    st.error("❌ Keys Nahi Mili - Secrets Me Keys Daalo")
+    YOUTUBE_KEY = ""
+    GEMINI_KEY = ""
 
-topic = st.text_input("🔍 Apna Topic Likho - Misaal: Sea View", placeholder="Sea View Vlog")
+channel_id = st.text_input("🔍 Apne Channel Ka ID Ya Naam Likho", placeholder="Misaal: @AliMahiVlogs ya UCxxxx")
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 Dashboard", "🔍 Channel Audit", "🏷️ Title / Tags", "🌍 Trend + Country", "💰 RPM Barhao"])
-
-with tab1:
-    st.subheader("📊 Dashboard - Tumhara Channel Score")
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Channel Score", "68 / 100", "-2")
-    c2.metric("Views", "12,500", "+500")
-    c3.metric("Subs", "850", "+20")
-    c4.metric("RPM", "0.5 $", "-0.1 $")
-    st.success("Best Upload Time: Kal Raat 9 Baje - Pakistan Time")
-    st.info("Best Topic: Sea View Raat Ko - Pakistan Me 85% Upar Ja Raha Hai")
-
-with tab2:
-    st.subheader("🔍 Full Channel Audit")
-    st.write("**Video 1: Sea View Me Ye Kya Mila?** - Views: 1000")
-    st.progress(72)
-    st.write("Title: 72/100 | Thumbnail: 60/100 | Description: 50/100 | Tags: 40/100")
-    if st.button("Fix Karo - Video 1"):
-        st.success("Fix Ho Gaya! Naya Title: Sea View Me Mujhe Ye Mila - Sab Hairan! | Score Ab 95/100 Hai")
-    st.write("---")
-    st.write("**Video 2: Saddar Ka Sasta Bazar** - Views: 5000")
-    st.progress(95)
-    st.write("Title: 95/100 | Thumbnail: 90/100 | Description: 85/100 | Tags: 88/100")
-    st.success("Ye Video Achi Hai, Isko Chhero Mat")
-
-with tab3:
-    st.subheader("🏷️ Title / Description / Tags - Score + Suggest")
-    title = st.text_input("Apna Title Likho", "Sea View Me Ye Kya Mila?")
-    if st.button("Score Check Karo"):
-        st.warning("Tumhara Title Score: 72/100 - Kam Hai")
-        st.success("Ranktube Suggest: 1. Sea View Me Mujhe Ye Mila - Sab Hairan! - 95/100")
-        st.success("2. Sea View Raat Ko Kaisa Lagta Hai? - 92/100")
-        st.success("3. Sea View Me Sab Se Sasta Khana Kahan Milta Hai? - 90/100")
-    st.code("sea view vlog, sea view karachi, sea view raat ko, karachi sea view, sea view food, sea view 2026")
-
-with tab4:
-    st.subheader("🌍 Trend + Country Ke Hisab Se")
-    country = st.selectbox("Country Chuno", ["Pakistan", "India", "USA", "UK", "UAE", "Saudi Arabia"])
-    if country == "Pakistan":
-        st.success("Pakistan Me Trend: 85% Upar Ja Raha Hai - Karachi Me Sab Se Zyada Search Ho Raha Hai")
-        st.info("Idea: 1. Sea View Raat Ko  2. Sea View Ka Sasta Khana  3. Sea View Me Ye Kya Mila?")
+if st.button("Asli Data Lao"):
+    if not YOUTUBE_KEY:
+        st.warning("Pehle YouTube Key Secrets Me Daalo")
+    elif not channel_id:
+        st.warning("Pehle Channel ID Likho")
     else:
-        st.warning(f"{country} Me Trend: 30% Neeche Ja Raha Hai - Is Country Ke Liye Video Mat Banao")
-    st.write("Pakistan: Long - Subah 9 / Raat 9 - Shorts - Dopahar 1 / Shaam 6")
-    st.write("USA: Long - Raat 8 Baje USA Time - Pakistan Me Subah 5 Baje")
+        # Channel ID se Search karna
+        url = f"https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id={channel_id}&key={YOUTUBE_KEY}"
+        # Agar @ wala naam hai to search API use karo
+        if channel_id.startswith("@"):
+            url = f"https://www.googleapis.com/youtube/v3/search?part=snippet&q={channel_id}&type=channel&key={YOUTUBE_KEY}"
+            r = requests.get(url).json()
+            if "items" in r and len(r["items"]) > 0:
+                real_id = r["items"][0]["snippet"]["channelId"]
+                url2 = f"https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id={real_id}&key={YOUTUBE_KEY}"
+                r = requests.get(url2).json()
+            else:
+                st.error("Channel Nahi Mila - Naam Sahi Likho")
+                st.stop()
+        else:
+            r = requests.get(url).json()
+        
+        if "items" in r and len(r["items"]) > 0:
+            data = r["items"][0]
+            stats = data["statistics"]
+            snip = data["snippet"]
+            st.subheader(f"Channel: {snip['title']}")
+            c1, c2, c3 = st.columns(3)
+            c1.metric("Subs", stats.get("subscriberCount", "0"))
+            c2.metric("Total Views", stats.get("viewCount", "0"))
+            c3.metric("Total Videos", stats.get("videoCount", "0"))
+            st.write(snip.get("description", "")[:300])
+            st.success("Ye Asli Data Hai - YouTube Se Aaya Hai!")
+        else:
+            st.error("Channel Nahi Mila. Channel ID Sahi Likho. Channel ID Kaise Milega? YouTube Studio -> Settings -> Channel -> Advanced Settings Me Hota Hai")
 
-with tab5:
-    st.subheader("💰 RPM Barhao - Paisa 10 Guna")
-    st.write("Tumhara RPM: 0.5 $ - Kam Hai")
-    st.write("High RPM Topic: Finance - 5-10 $ | Tech - 4-8 $ | Comedy - 0.3 $")
-    st.error("Tum Comedy bana rahe ho, iska RPM kam hai. Comedy me Finance mila do - RPM 10 Guna badh jayega")
-    if st.button("RPM Fix Karo"):
-        st.success("Fix Ho Gaya! Pehle RPM 0.5 $ tha, Ab 2.0 $ Ho Gaya Hai")
+# Purane Tabs bhi rakhe hain
+st.write("---")
+topic = st.text_input("🔍 Topic Likho - AI Se Title Banwao", "Sea View")
+if st.button("AI Se Title Banwao"):
+    if not GEMINI_KEY:
+        st.warning("Pehle Gemini Key Secrets Me Daalo")
+    else:
+        # Gemini API call
+        gem_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_KEY}"
+        payload = {"contents": [{"parts": [{"text": f"Pakistani YouTube ke liye {topic} par 5 viral title banao, Urdu + English mix me, high CTR wale"}]}]}
+        gr = requests.post(gem_url, json=payload).json()
+        try:
+            text = gr["candidates"][0]["content"]["parts"][0]["text"]
+            st.success("AI Ne Ye Title Banaye:")
+            st.write(text)
+        except:
+            st.error("Gemini Key Me Masla Hai - Key Sahi Hai? Secrets Me Check Karo")
+            st.write(gr)
 
 st.write("---")
 st.write("Made With ❤️ - RANKTUBE PRO")
