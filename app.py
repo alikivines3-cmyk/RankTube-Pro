@@ -5,22 +5,37 @@ st.set_page_config(page_title="RANKTUBE PRO", page_icon="📈", layout="wide")
 
 st.markdown("""
 <style>
-.main { background-color: #0f0f0f; }
-.stApp { background-color: #0f0f0f; color: white; }
+.main { background-color: #0a0a0f; }
+.stApp { background-color: #0a0a0f; color: white; }
 h1, h2, h3 { color: white !important; }
-.logo-box { display: flex; align-items: center; gap: 15px; }
-.logo-circle { width: 70px; height: 70px; background: linear-gradient(135deg, #FF0000, #FF4444); border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 20px rgba(255,0,0,0.5); }
-.logo-play { color: white; font-size: 32px; margin-left: 5px; }
-.logo-arrow { position: absolute; top: -8px; right: -8px; background: white; color: #FF0000; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; border: 2px solid #FF0000; }
-.hero { background: linear-gradient(135deg, #FF0000, #7a0000); padding: 30px; border-radius: 20px; text-align: center; margin-bottom: 20px; }
-.feature-card { background: #1a1a1a; border: 1px solid #333; border-radius: 15px; padding: 20px; text-align: center; }
-div[data-testid="stMetric"] { background: linear-gradient(135deg, #1e1e1e, #2a2a2a); border: 1px solid #333; border-radius: 12px; padding: 15px; }
-div[data-testid="stMetric"] label { color: #aaa !important; }
-div[data-testid="stMetric"] div { color: white !important; }
-.stButton>button { background: linear-gradient(90deg, #FF0000, #FF4444); color: white; border: none; border-radius: 25px; padding: 10px 25px; font-weight: bold; width: 100%; }
-.country-box { background: #1a1a1a; border: 2px solid #FF0000; border-radius: 15px; padding: 15px; }
-.audit-good { background: #0a5c2e; padding: 10px; border-radius: 10px; }
-.audit-bad { background: #7a1a1a; padding: 10px; border-radius: 10px; }
+.logo-box { display: flex; align-items: center; gap: 18px; background: linear-gradient(90deg, #1a1a2e, #0f0f0f); padding: 15px 20px; border-radius: 20px; border: 1px solid #333; }
+.logo-circle { width: 75px; height: 75px; background: linear-gradient(135deg, #FF0000, #FF6B00); border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 25px rgba(255,0,0,0.6); flex-shrink: 0; }
+.logo-play { color: white; font-size: 34px; margin-left: 6px; }
+.logo-arrow { position: absolute; top: -8px; right: -8px; background: white; color: #FF0000; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; border: 2px solid #FF0000; }
+.hero { background: linear-gradient(135deg, #FF0000 0%, #FF6B00 40%, #7a00ff 100%); padding: 40px 20px; border-radius: 25px; text-align: center; margin-bottom: 25px; box-shadow: 0 10px 40px rgba(255,0,0,0.3); }
+.hero h1 { font-size: 48px !important; text-shadow: 2px 2px 10px rgba(0,0,0,0.4); }
+.box-red { background: linear-gradient(135deg, #FF0000, #FF6B00); border-radius: 20px; padding: 25px 15px; text-align: center; min-height: 180px; box-shadow: 0 8px 25px rgba(255,0,0,0.3); }
+.box-blue { background: linear-gradient(135deg, #0066FF, #00CCFF); border-radius: 20px; padding: 25px 15px; text-align: center; min-height: 180px; box-shadow: 0 8px 25px rgba(0,102,255,0.3); }
+.box-green { background: linear-gradient(135deg, #00AA44, #00DD77); border-radius: 20px; padding: 25px 15px; text-align: center; min-height: 180px; box-shadow: 0 8px 25px rgba(0,170,68,0.3); }
+.box-purple { background: linear-gradient(135deg, #7A00FF, #FF00AA); border-radius: 20px; padding: 25px 15px; text-align: center; min-height: 180px; box-shadow: 0 8px 25px rgba(122,0,255,0.3); }
+.box-orange { background: linear-gradient(135deg, #FF8800, #FFCC00); border-radius: 20px; padding: 25px 15px; text-align: center; min-height: 160px; }
+.box-pink { background: linear-gradient(135deg, #FF0066, #FF66AA); border-radius: 20px; padding: 25px 15px; text-align: center; min-height: 160px; }
+.box-teal { background: linear-gradient(135deg, #00AAAA, #00FFCC); border-radius: 20px; padding: 25px 15px; text-align: center; min-height: 160px; }
+.box-dark { background: linear-gradient(135deg, #222244, #444488); border-radius: 20px; padding: 25px 15px; text-align: center; min-height: 160px; }
+.big-title { font-size: 36px !important; font-weight: 800; margin-bottom: 5px; }
+.big-icon { font-size: 48px; }
+.small-desc { font-size: 15px; color: rgba(255,255,255,0.9); }
+div[data-testid="stMetric"] { border-radius: 18px !important; padding: 18px !important; border: none !important; }
+.stButton>button { background: linear-gradient(90deg, #FF0000, #FF6B00); color: white; border: none; border-radius: 30px; padding: 12px 25px; font-weight: bold; width: 100%; font-size: 16px; box-shadow: 0 5px 15px rgba(255,0,0,0.3); }
+.stButton>button:hover { background: linear-gradient(90deg, #CC0000, #FF0000); color: white; transform: scale(1.02); }
+.section-red { background: linear-gradient(135deg, #2a0000, #1a0000); border-left: 6px solid #FF0000; padding: 20px; border-radius: 15px; }
+.section-blue { background: linear-gradient(135deg, #001a33, #000a1a); border-left: 6px solid #0066FF; padding: 20px; border-radius: 15px; }
+.section-green { background: linear-gradient(135deg, #002a11, #001a0a); border-left: 6px solid #00AA44; padding: 20px; border-radius: 15px; }
+.section-purple { background: linear-gradient(135deg, #1a0033, #0f001a); border-left: 6px solid #7A00FF; padding: 20px; border-radius: 15px; }
+.section-orange { background: linear-gradient(135deg, #331a00, #1a0f00); border-left: 6px solid #FF8800; padding: 20px; border-radius: 15px; }
+.country-box { background: linear-gradient(135deg, #1a1a2e, #2a1a4e); border: 2px solid #7A00FF; border-radius: 20px; padding: 20px; }
+.audit-good { background: linear-gradient(90deg, #00AA44, #00DD77); padding: 12px; border-radius: 12px; font-weight: bold; }
+.audit-bad { background: linear-gradient(90deg, #FF0000, #FF4444); padding: 12px; border-radius: 12px; font-weight: bold; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -89,8 +104,8 @@ st.markdown("""
 <div class="logo-box">
     <div class="logo-circle"><div class="logo-play">▶</div><div class="logo-arrow">↗</div></div>
     <div>
-        <h1 style="margin:0; font-size:38px;">RANK<span style="color:#FF0000;">TUBE</span> <span style="color:#FF0000;">PRO</span> <span style="font-size:20px;">📈</span></h1>
-        <p style="margin:0; color:#aaa;">Pakistans No.1 YouTube Growth Tool | AI Powered | Grow Fast</p>
+        <h1 style="margin:0; font-size:40px;">RANK<span style="color:#FF0000;">TUBE</span> <span style="color:#FF8800;">PRO</span> <span style="font-size:22px;">📈</span></h1>
+        <p style="margin:0; color:#ccc; font-size:16px;">Pakistans No.1 YouTube Growth Tool | AI Powered | Grow Fast ↗</p>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -99,22 +114,35 @@ st.write("---")
 if not st.session_state.logged_in:
     st.markdown("""
     <div class="hero">
-        <h1 style="color:white; font-size:42px;">Grow Your YouTube Channel 10X Faster</h1>
-        <p style="color:white; font-size:18px;">AI Titles | Country Wise Trends | Channel Audit | Competitor Spy</p>
-        <p style="color:#ffcccc;">Join 5000+ Creators Using RANKTUBE PRO</p>
+        <div style="font-size:70px;">🚀</div>
+        <h1 style="color:white;">Grow Your YouTube Channel 10X Faster</h1>
+        <p style="color:white; font-size:20px; font-weight:bold;">AI Titles | Country Wise Trends | Channel Audit | Competitor Spy | RPM Calculator</p>
+        <p style="color:#ffe6cc; font-size:16px;">⭐⭐⭐⭐⭐ Join 5000+ Pakistani Creators | 100% Free To Start</p>
     </div>
     """, unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align:center; font-size:32px;'>✨ WHY CHOOSE RANKTUBE PRO? ✨</h2>", unsafe_allow_html=True)
     c1, c2, c3, c4 = st.columns(4)
     with c1:
-        st.markdown('<div class="feature-card"><h2>AI Titles</h2><p>Viral Titles In 10 Sec</p></div>', unsafe_allow_html=True)
+        st.markdown('<div class="box-red"><div class="big-icon">🤖</div><div class="big-title">AI TITLES</div><div class="small-desc">Viral Titles In 10 Sec<br>High CTR | Urdu + English</div></div>', unsafe_allow_html=True)
     with c2:
-        st.markdown('<div class="feature-card"><h2>Country Trends</h2><p>Trends By Country</p></div>', unsafe_allow_html=True)
+        st.markdown('<div class="box-blue"><div class="big-icon">🌍</div><div class="big-title">COUNTRY TRENDS</div><div class="small-desc">Trends By Country<br>Pakistan | USA | India | UK</div></div>', unsafe_allow_html=True)
     with c3:
-        st.markdown('<div class="feature-card"><h2>Channel Audit</h2><p>Score Out Of 100</p></div>', unsafe_allow_html=True)
+        st.markdown('<div class="box-green"><div class="big-icon">📊</div><div class="big-title">CHANNEL AUDIT</div><div class="small-desc">Score Out Of 100<br>What To Fix? Full Report</div></div>', unsafe_allow_html=True)
     with c4:
-        st.markdown('<div class="feature-card"><h2>Competitor Spy</h2><p>Beat Competitor</p></div>', unsafe_allow_html=True)
+        st.markdown('<div class="box-purple"><div class="big-icon">⚔️</div><div class="big-title">COMPETITOR SPY</div><div class="small-desc">Beat Your Competitor<br>See Their Secret Strategy</div></div>', unsafe_allow_html=True)
+    st.write("")
+    c5, c6, c7, c8 = st.columns(4)
+    with c5:
+        st.markdown('<div class="box-orange"><div class="big-icon">💰</div><div class="big-title">RPM CALCULATOR</div><div class="small-desc">Kitne Paise Banein Ge?</div></div>', unsafe_allow_html=True)
+    with c6:
+        st.markdown('<div class="box-pink"><div class="big-icon">🖼️</div><div class="big-title">THUMBNAIL AI</div><div class="small-desc">Viral Thumbnail Ideas</div></div>', unsafe_allow_html=True)
+    with c7:
+        st.markdown('<div class="box-teal"><div class="big-icon">🔥</div><div class="big-title">TRENDING VIDEOS</div><div class="small-desc">Watch Trending Videos</div></div>', unsafe_allow_html=True)
+    with c8:
+        st.markdown('<div class="box-dark"><div class="big-icon">🔗</div><div class="big-title">CHANNEL CONNECT</div><div class="small-desc">Connect In 1 Click</div></div>', unsafe_allow_html=True)
     st.write("---")
-    st.subheader("Step 1: Sign Up With Google")
+    st.markdown("<h2 style='text-align:center; font-size:30px;'>🔐 STEP 1: SIGN UP WITH GOOGLE 🔐</h2>", unsafe_allow_html=True)
+    st.write("Sign Up Karo, Phir Channel Connect Karo, Phir Full Tool Khul Jayega")
     email = st.text_input("Enter Your Gmail", placeholder="example@gmail.com")
     col_g1, col_g2 = st.columns(2)
     with col_g1:
@@ -132,7 +160,8 @@ if not st.session_state.logged_in:
             st.rerun()
     st.stop()
 
-st.success(f"Welcome: {st.session_state.user_email}")
+st.markdown(f"<div class='section-green'><h2 style='margin:0;'>👋 Welcome Back! {st.session_state.user_email} ✅ Logged In</h2></div>", unsafe_allow_html=True)
+st.write("")
 col_logout, col_conn = st.columns([1, 3])
 with col_logout:
     if st.button("Logout"):
@@ -143,9 +172,9 @@ with col_conn:
     if st.session_state.connected_channel:
         st.success(f"Connected Channel: {st.session_state.connected_channel}")
     else:
-        st.warning("Channel Not Connected Yet")
+        st.warning("Channel Not Connected Yet - Connect Below")
 
-with st.expander("Step 2: Connect Your Channel", expanded=(st.session_state.connected_channel == "")):
+with st.expander("STEP 2: CONNECT YOUR CHANNEL - CLICK HERE", expanded=(st.session_state.connected_channel == "")):
     conn_input = st.text_input("Enter Channel Name", "@AliMahiVlogs")
     if st.button("Connect Channel"):
         d = get_channel_data(conn_input)
@@ -156,37 +185,46 @@ with st.expander("Step 2: Connect Your Channel", expanded=(st.session_state.conn
         else:
             st.error("Channel Not Found")
 
-tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["Dashboard", "Title + Script", "Trends By Country", "RPM Calculator", "Competitor", "Thumbnail", "Channel Audit"])
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["📊 Dashboard", "✍️ Title + Script", "🌍 Trends By Country", "💰 RPM Calculator", "⚔️ Competitor", "🖼️ Thumbnail", "✅ Channel Audit"])
 
 with tab1:
-    st.header("Channel Dashboard - Full Profile")
+    st.markdown("<div class='section-red'><h2 style='margin:0; font-size:32px;'>📊 CHANNEL DASHBOARD - FULL PROFILE 📊</h2><p style='margin:0;'>Your Channel Logo, Banner, Stats And Latest Videos</p></div>", unsafe_allow_html=True)
+    st.write("")
     ch = st.text_input("Channel", value=st.session_state.connected_channel if st.session_state.connected_channel else "@AliMahiVlogs", key="dash_ch")
     if st.button("Get Full Channel Data"):
-        with st.spinner("Loading Logo, Banner and Videos..."):
+        with st.spinner("Loading..."):
             data = get_channel_data(ch)
         if data:
             stats = data["statistics"]
             snip = data["snippet"]
             cid = data["id"]
             if "banner" in data.get("brandingSettings", {}).get("image", {}):
-                banner_url = data["brandingSettings"]["image"]["bannerExternalUrl"]
-                st.image(banner_url, use_container_width=True)
+                st.image(data["brandingSettings"]["image"]["bannerExternalUrl"], use_container_width=True)
             col_logo, col_info = st.columns([1, 4])
             with col_logo:
                 st.image(snip["thumbnails"]["high"]["url"], width=130)
             with col_info:
-                st.subheader(snip["title"])
+                st.markdown(f"<h2 style='font-size:32px;'>{snip['title']} ✅</h2>", unsafe_allow_html=True)
                 st.write(snip.get("description", "")[:300])
                 st.link_button("Visit On YouTube", f"https://www.youtube.com/channel/{cid}")
             st.write("---")
+            st.markdown("<h3>📈 YOUR STATS</h3>", unsafe_allow_html=True)
             c1, c2, c3, c4 = st.columns(4)
-            c1.metric("Subscribers", f"{int(stats.get('subscriberCount', '0')):,}")
-            c2.metric("Total Views", f"{int(stats.get('viewCount', '0')):,}")
-            c3.metric("Total Videos", stats.get("videoCount", "0"))
-            avg_val = int(stats.get("viewCount", "0")) // max(int(stats.get("videoCount", "1")), 1)
-            c4.metric("Avg Views", f"{avg_val:,}")
+            with c1:
+                st.markdown('<div class="box-red" style="min-height:120px;"><div class="big-icon">👥</div><div>SUBSCRIBERS</div></div>', unsafe_allow_html=True)
+                st.metric("Subscribers", f"{int(stats.get('subscriberCount', '0')):,}")
+            with c2:
+                st.markdown('<div class="box-blue" style="min-height:120px;"><div class="big-icon">👁️</div><div>TOTAL VIEWS</div></div>', unsafe_allow_html=True)
+                st.metric("Total Views", f"{int(stats.get('viewCount', '0')):,}")
+            with c3:
+                st.markdown('<div class="box-green" style="min-height:120px;"><div class="big-icon">🎬</div><div>TOTAL VIDEOS</div></div>', unsafe_allow_html=True)
+                st.metric("Total Videos", stats.get("videoCount", "0"))
+            with c4:
+                avg_val = int(stats.get("viewCount", "0")) // max(int(stats.get("videoCount", "1")), 1)
+                st.markdown('<div class="box-purple" style="min-height:120px;"><div class="big-icon">📊</div><div>AVG VIEWS</div></div>', unsafe_allow_html=True)
+                st.metric("Avg Views", f"{avg_val:,}")
             st.write("---")
-            st.subheader("Latest Videos")
+            st.markdown("<h3>🎬 LATEST VIDEOS - WATCH HERE</h3>", unsafe_allow_html=True)
             vids = get_channel_videos(cid, 6)
             for i in range(0, len(vids), 3):
                 cols = st.columns(3)
@@ -198,22 +236,23 @@ with tab1:
                             st.image(v["snippet"]["thumbnails"]["medium"]["url"], use_container_width=True)
                             st.write(v["snippet"]["title"][:60])
                             st.video(f"https://www.youtube.com/watch?v={vid}")
-                            st.link_button("Watch On YouTube", f"https://www.youtube.com/watch?v={vid}")
         else:
             st.error("Channel Not Found")
 
 with tab2:
-    st.header("AI Title + Script Generator")
+    st.markdown("<div class='section-blue'><h2 style='margin:0; font-size:32px;'>✍️ AI TITLE + SCRIPT GENERATOR ✍️</h2><p style='margin:0;'>Viral Titles, Script, Hashtags In 10 Seconds</p></div>", unsafe_allow_html=True)
+    st.write("")
     topic = st.text_input("Video Topic", "Sea View Karachi")
     niche = st.selectbox("Niche", ["Vlog", "Gaming", "Tech", "Islamic", "Comedy", "Food", "News"])
     if st.button("Generate With AI"):
         with st.spinner("AI Thinking..."):
             result = call_gemini(f"For Pakistani YouTube {niche} channel, topic {topic}: Give 1) 5 viral titles Urdu English mix 2) 30 sec script 3) 10 hashtags 4) Best upload time Pakistan. In English.")
+        st.markdown("<h3>🤖 AI RESULT</h3>", unsafe_allow_html=True)
         st.write(result)
 
 with tab3:
-    st.header("Trends By Country - Select Country")
-    st.write("Select Any Country - That Country Real Trend Will Show")
+    st.markdown("<div class='section-purple'><h2 style='margin:0; font-size:32px;'>🌍 TRENDS BY COUNTRY 🌍</h2><p style='margin:0;'>Select Any Country - That Country Real Trend Will Show</p></div>", unsafe_allow_html=True)
+    st.write("")
     st.markdown('<div class="country-box">', unsafe_allow_html=True)
     col_c1, col_c2 = st.columns([2, 1])
     with col_c1:
@@ -224,13 +263,13 @@ with tab3:
     st.write(f"Selected: {selected_country_name} - Code: {selected_code}")
     st.markdown('</div>', unsafe_allow_html=True)
     st.write("---")
-    st.subheader(f"Google Trends In {selected_country_name}")
+    st.markdown(f"<h3>📈 GOOGLE TRENDS IN {selected_country_name.upper()}</h3>", unsafe_allow_html=True)
     if st.button(f"Get Google Trends - {selected_country_name}"):
         with st.spinner(f"Fetching Google Trends For {selected_country_name}..."):
             res = call_gemini(f"Give REAL Google Trends for country {selected_country_name} right now. Category {trend_category}. Give Top 10 most searched keywords on Google in {selected_country_name} today, with search volume High Medium Low, and 1 YouTube video idea for each keyword. Also give 5 Rising keywords. In English.")
         st.write(res)
     st.write("---")
-    st.subheader(f"YouTube Trending Videos In {selected_country_name}")
+    st.markdown(f"<h3>🎬 YOUTUBE TRENDING VIDEOS IN {selected_country_name.upper()}</h3>", unsafe_allow_html=True)
     if st.button(f"Load YouTube Trending - {selected_country_name}"):
         with st.spinner(f"Loading YouTube Trending For {selected_country_name}..."):
             url = f"https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&chart=mostPopular&regionCode={selected_code}&maxResults=9&key={YOUTUBE_KEY}"
@@ -249,11 +288,10 @@ with tab3:
                             st.write(v["snippet"]["title"][:60])
                             st.write(f"{v['snippet']['channelTitle']} | Views {int(v['statistics'].get('viewCount', '0')):,}")
                             st.video(f"https://www.youtube.com/watch?v={vid}")
-                            st.link_button("Watch On YouTube", f"https://www.youtube.com/watch?v={vid}")
         else:
             st.error(f"No Trending Found For {selected_country_name}")
     st.write("---")
-    st.subheader("Compare 2 Countries")
+    st.markdown("<h3>⚖️ COMPARE 2 COUNTRIES</h3>", unsafe_allow_html=True)
     col_cmp1, col_cmp2 = st.columns(2)
     with col_cmp1:
         cmp1 = st.selectbox("Country 1", list(COUNTRIES.keys()), index=0, key="cmp1")
@@ -261,27 +299,35 @@ with tab3:
         cmp2 = st.selectbox("Country 2", list(COUNTRIES.keys()), index=2, key="cmp2")
     if st.button("Compare Countries Trends"):
         with st.spinner("Comparing..."):
-            comp_res = call_gemini(f"Compare Google and YouTube Trends between {cmp1} and {cmp2}. Give Top 5 trending topics in each country, what is common, what is different, and which country has better opportunity for a Pakistani YouTuber. In English.")
+            comp_res = call_gemini(f"Compare Google and YouTube Trends between {cmp1} and {cmp2}. Give Top 5 trending topics in each country, what is common, what is different. In English.")
         st.write(comp_res)
 
 with tab4:
-    st.header("RPM Calculator")
+    st.markdown("<div class='section-green'><h2 style='margin:0; font-size:32px;'>💰 RPM / EARNINGS CALCULATOR 💰</h2><p style='margin:0;'>Kitne Paise Banein Ge? Calculate Karo</p></div>", unsafe_allow_html=True)
+    st.write("")
     views = st.number_input("Views Per Month?", value=100000)
     niche_rpm = st.selectbox("Your Niche?", ["Vlog - 1 Dollar", "Gaming - 1.5 Dollar", "Tech - 3 Dollar", "Finance - 5 Dollar", "Islamic - 1.2 Dollar", "Food - 1.8 Dollar"])
     rpm_text = niche_rpm.split("-")[1].strip().split(" ")[0]
     rpm_val = float(rpm_text)
     earning = (views / 1000) * rpm_val
     c1, c2, c3 = st.columns(3)
-    c1.metric("Monthly Dollar", f"{earning:.2f} USD")
-    c2.metric("Monthly Rupees", f"{earning*280:,.0f} PKR")
-    c3.metric("Yearly Dollar", f"{earning*12:.2f} USD")
+    with c1:
+        st.markdown('<div class="box-green"><div class="big-icon">💵</div><div>MONTHLY DOLLAR</div></div>', unsafe_allow_html=True)
+        st.metric("Monthly Dollar", f"{earning:.2f} USD")
+    with c2:
+        st.markdown('<div class="box-orange"><div class="big-icon">💴</div><div>MONTHLY RUPEES</div></div>', unsafe_allow_html=True)
+        st.metric("Monthly Rupees", f"{earning*280:,.0f} PKR")
+    with c3:
+        st.markdown('<div class="box-purple"><div class="big-icon">🏦</div><div>YEARLY DOLLAR</div></div>', unsafe_allow_html=True)
+        st.metric("Yearly Dollar", f"{earning*12:.2f} USD")
     if st.button("How To Increase RPM?"):
         with st.spinner("Asking AI..."):
             rpm_res = call_gemini(f"How to increase RPM for Pakistani YouTube? Niche {niche_rpm}, views {views}. Give 5 tips in English.")
         st.write(rpm_res)
 
 with tab5:
-    st.header("Competitor Analysis")
+    st.markdown("<div class='section-orange'><h2 style='margin:0; font-size:32px;'>⚔️ COMPETITOR ANALYSIS ⚔️</h2><p style='margin:0;'>See Competitor Secret - Beat Them</p></div>", unsafe_allow_html=True)
+    st.write("")
     comp = st.text_input("Competitor Name", "@DuckyBhai")
     if st.button("Analyze Competitor"):
         with st.spinner("Analyzing..."):
@@ -294,7 +340,6 @@ with tab5:
                 st.image(data["brandingSettings"]["image"]["bannerExternalUrl"], use_container_width=True)
             st.image(snip["thumbnails"]["high"]["url"], width=120)
             st.subheader(snip["title"])
-            st.write(snip.get("description", "")[:250])
             c1, c2, c3 = st.columns(3)
             c1.metric("Their Subs", f"{int(stats.get('subscriberCount', '0')):,}")
             c2.metric("Their Views", f"{int(stats.get('viewCount', '0')):,}")
@@ -306,25 +351,26 @@ with tab5:
                 st.write(v["snippet"]["title"][:70])
                 st.video(f"https://www.youtube.com/watch?v={v['id']['videoId']}")
             if st.button("Ask AI - How To Beat Them?"):
-                beat_res = call_gemini(f"Competitor {snip['title']} has {stats.get('subscriberCount')} subs. How to beat them? Give 5 strategies for Pakistani audience in English.")
+                beat_res = call_gemini(f"Competitor {snip['title']} has {stats.get('subscriberCount')} subs. How to beat them? Give 5 strategies.")
                 st.write(beat_res)
         else:
             st.error("Competitor Not Found")
 
 with tab6:
-    st.header("Thumbnail Ideas - AI")
+    st.markdown("<div class='section-purple'><h2 style='margin:0; font-size:32px;'>🖼️ THUMBNAIL IDEAS - AI 🖼️</h2><p style='margin:0;'>Viral Thumbnail Ideas - High CTR</p></div>", unsafe_allow_html=True)
+    st.write("")
     th_topic = st.text_input("Video Topic", "What I Saw At Sea View?")
     if st.button("Generate Thumbnail Ideas"):
         with st.spinner("AI Designing..."):
-            thumb_res = call_gemini(f"For video topic {th_topic} give 5 viral thumbnail ideas. For each: Text, Color, Face expression, Background. For Pakistani audience, high CTR. In English.")
+            thumb_res = call_gemini(f"For video topic {th_topic} give 5 viral thumbnail ideas. For each: Text, Color, Face expression, Background. For Pakistani audience.")
         st.write(thumb_res)
 
 with tab7:
-    st.header("Channel Audit - Full Report Card")
-    st.write("AI Will Audit Your Channel And Give Score Out Of 100")
+    st.markdown("<div class='section-blue'><h2 style='margin:0; font-size:32px;'>✅ CHANNEL AUDIT - FULL REPORT CARD ✅</h2><p style='margin:0;'>Your Score Out Of 100 - What To Fix?</p></div>", unsafe_allow_html=True)
+    st.write("")
     audit_ch = st.text_input("Channel To Audit", value=st.session_state.connected_channel if st.session_state.connected_channel else "@AliMahiVlogs", key="audit_ch")
     if st.button("Run Full Channel Audit"):
-        with st.spinner("Auditing Channel..."):
+        with st.spinner("Auditing..."):
             data = get_channel_data(audit_ch)
         if data:
             stats = data["statistics"]
@@ -362,12 +408,12 @@ with tab7:
                 score = score + 5
             if score > 100:
                 score = 100
-            st.markdown(f"### Your Channel Score: {score} / 100")
+            st.markdown(f"<h2 style='font-size:38px; text-align:center;'>🎯 YOUR SCORE: {score} / 100 🎯</h2>", unsafe_allow_html=True)
             st.progress(score / 100)
             if score >= 80:
-                st.success("EXCELLENT - Your Channel Is Growing Well!")
+                st.success("EXCELLENT - Growing Well!")
             elif score >= 50:
-                st.warning("GOOD - But Needs Improvement")
+                st.warning("GOOD - Needs Improvement")
             else:
                 st.error("NEEDS WORK - Follow Audit Below")
             c1, c2, c3, c4 = st.columns(4)
@@ -380,23 +426,22 @@ with tab7:
             if subs >= 1000:
                 st.markdown('<div class="audit-good">OK - Monetization Subs Complete</div>', unsafe_allow_html=True)
             else:
-                st.markdown(f'<div class="audit-bad">NEED - Monetization Subs: {subs} / 1000</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="audit-bad">NEED - Subs: {subs} / 1000</div>', unsafe_allow_html=True)
             st.write("")
             if vcount >= 20:
-                st.markdown('<div class="audit-good">OK - Total Videos Good</div>', unsafe_allow_html=True)
+                st.markdown('<div class="audit-good">OK - Videos Good</div>', unsafe_allow_html=True)
             else:
-                st.markdown(f'<div class="audit-bad">NEED - Total Videos Only {vcount} - Need At Least 20</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="audit-bad">NEED - Videos Only {vcount} - Need 20</div>', unsafe_allow_html=True)
             st.write("")
             if avg_views >= 500:
                 st.markdown('<div class="audit-good">OK - Avg Views Good</div>', unsafe_allow_html=True)
             else:
-                st.markdown(f'<div class="audit-bad">NEED - Avg Views Only {avg_views} - Need More CTR</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="audit-bad">NEED - Avg Views Only {avg_views}</div>', unsafe_allow_html=True)
             st.write("")
-            st.subheader("AI Audit - What To Fix?")
-            ai_audit = call_gemini(f"Audit this YouTube channel: Name {snip['title']}, Subs {subs}, Views {views}, Videos {vcount}, Avg Views {avg_views}, Score {score} out of 100. Give 5 specific things to fix to grow faster in Pakistan, in English.")
+            ai_audit = call_gemini(f"Audit channel {snip['title']}, Subs {subs}, Views {views}, Videos {vcount}, Avg {avg_views}, Score {score}/100. Give 5 things to fix in Pakistan.")
             st.write(ai_audit)
         else:
-            st.error("Channel Not Found For Audit")
+            st.error("Channel Not Found")
 
 st.write("---")
-st.markdown("<p style='text-align:center; color:#888;'>Made With Love - RANKTUBE PRO | Ali Mahi | Version 6.0 - All In One</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center; color:#888; font-size:16px;'>Made With Love - RANKTUBE PRO | Ali Mahi | Version 7.0 MODERN - Eye Catching</p>", unsafe_allow_html=True)
